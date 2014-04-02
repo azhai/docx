@@ -28,22 +28,21 @@ if (t[0] && $('article')[0].scrollHeight > $('.right-column').height()) t[0].sty
 //Toggle Code Block Visibility
 function toggleCodeBlocks() {
     var t = localStorage.getItem("toggleCodeStats")
-    t = (t + 1) % 3;
     localStorage.setItem("toggleCodeStats", t);
     var a = $('.content-page article');
     var c = a.children().filter('pre');
     var d = $('.right-column');
     if (d.hasClass('float-view')) {
         d.removeClass('float-view');
-        $('#toggleCodeBlockBtn')[0].innerHTML = "Hide Code Blocks";
+        $('#toggleCodeBlockBtn')[0].innerHTML = "隐藏代码框";
     } else {
         if (c.hasClass('hidden')) {
+            c.addClass('hidden');
+            $('#toggleCodeBlockBtn')[0].innerHTML = "外置代码框";
+        } else {
             d.addClass('float-view');
             c.removeClass('hidden');
-            $('#toggleCodeBlockBtn')[0].innerHTML = "Show Code Blocks Inline";
-        } else {
-            c.addClass('hidden');
-            $('#toggleCodeBlockBtn')[0].innerHTML = "Show Code Blocks";
+            $('#toggleCodeBlockBtn')[0].innerHTML = "内嵌代码框";
         }
     }
 }

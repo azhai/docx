@@ -1,85 +1,94 @@
-**Daux.io** is an documentation generator that uses a simple folder structure and Markdown files to create custom documentation on the fly. It helps you create great looking documentation in a developer friendly way.
+最简单的方式构建你的项目文档
 
-## Features
+**Daux.io** 是一个文档生成器,可以帮助用户快速生成漂亮的项目文档，此外，用户还可以通过简单的文件结构和Markdown文件来创建自定义格式的文档。 它可以帮助你使用对于开发更加友好的方式创建文档。
 
-* 100% Mobile Responsive
-* Supports GitHub Flavored Markdown
-* Auto created homepage/landing page
-* Auto Syntax Highlighting
-* Auto Generated Navigation
-* 4 Built-In Themes or roll your own
-* Functional, Flat Design Style
-* Shareable/Linkable SEO Friendly URLs
-* Built On Bootstrap
-* No Build Step
-* Git/SVN Friendly
-* Supports Google Analytics and Piwik Analytics
-* Optional code float layout
-* Static Output Generation
+## 快速使用 （docx添加）
 
-## Demos
+* 下载最新的项目代码 [docx](http://daux.io)，解压后在命令行下进入目录docx
+* 如果操作系统是Linux/BSD/MacOS，设置index.php为可执行 chmod +x index.php
+* 使用 php index.php generate 生成静态文件
+* 将web服务器的文档目录设置为 docx/static ，打开浏览器查看网站
+* 修改配置 docs/config.json，编辑docs目录*.md文档，重新生成静态文件
 
-This is a list of sites using Daux.io:
+## 产品特征
+
+* 100%移动响应
+* 支持GitHub Flavored Markdown
+* 自动创建主页/登陆页
+* 自动语法提示
+* 自动生成导航
+* 4款内置主题并支持自定义主题
+* 功能、扁平化设计
+* 共享/可链接的SEO友好性URL
+* 基于Bootstrap构建
+* 无需设置步骤
+* 友好的Git/SVN
+* 支持Google统计以及Piwik统计
+* 可选的代码浮动布局
+
+## 案例
+
+这是一个使用Daux.io的站点列表:
 
 * [Daux.io](http://daux.io)
 * [Munee: Standalone PHP 5.3 Asset Optimisation & Manipulation](http://mun.ee)
 * [ICADMIN: An admin panel powered by CodeIgniter.](http://istocode.com/shared/ic-admin/)
 * [Daux.io in Chinese - Demonstrates muti-language installations](http://daux.emx2.co.uk/)
 
-Do you use Daux.io? Send me a pull request or open an [issue](https://github.com/justinwalsh/daux.io/issues) and I will add you to the list.
+看到Daux.io了吗? 给我发送pull request或者新建一个[issue](https://github.com/justinwalsh/daux.io/issues),我将会将你的站点加入到这个列表里面!
 
-## Download
+## 下载
 
-Download this repository as a zip, and unpack. Copy the files to a web server that can run PHP 5.3 or greater. You can also run the documentation locally using Grunt.js, which is covered at the end of this readme.
+下载zip格式的版本库文件, 并且解压. 拷贝这些文件到一个可以运行高于PHP5.3版本的服务器上. 你还可以在本地使用Grunt.js运行这些文档，使用方法会在readme结尾处讨论.
 
-## Folders
+## 目录结构
 
-By default, the generator will look for folders in the `/docs` folder. Add your folders inside the `/docs` folder. This project contains some example folders and files to get you started.
+默认文档生成器会搜索目录`/docs`. 添加你的目录到`/docs`目录中. 该项目已经包括一些实例文件夹和文件帮助你快速使用.
 
-You can nest folders any number of levels to get the exact structure you want. The folder structure will be converted to the nested navigation.
+你可以嵌套任意级别的文件夹来达到你所希望的结构. 目录结构将会被转化为嵌套折叠导航.
 
-If you'd prefer to keep your docs somewhere else (like outside of the daux.io root directory) you can specify your docs path in the `config.json` file.
+如果你希望保留你的文档在其他位置(例如在 daux.io根目录之外的目录)，你可以通过在配置文件`config.json` 中指定文档路径.
 
-## Files
+## 文件
 
-The generator will look for Markdown `*.md` files inside the `/docs` folder and any of the subfolders within /docs.
+生成器将会搜索`/docs`目录及其子目录中的Markdown `*.md` 文件. 译者注:[Markdown](http://zh.wikipedia.org/zh/Markdown)是一种轻量级的标记语言.
 
-You must use the `.md` file extension for your files. Also, you must use underscores instead of spaces. Here are some example file names and what they will be converted to:
+你必须使用`.md` 文件扩展名命名你的文档文件. 另外文件名你需要使用下划线来代替空格 这里有一些文件名的案例已经它们转化为可以被接受的格式:
 
-**Good:**
+**推荐的格式:**
 
 * 01_Getting_Started.md = Getting Started
 * API_Calls.md = API Calls
 * 200_Something_Else-Cool.md = Something Else-Cool
 
-**Bad:**
+**不推荐:**
 
 * File Name With Space.md = FAIL
 
-## Sorting
+## 排序
 
-To sort your files and folders in a specific way, you can prefix them with a number and underscore, e.g. `/docs/01_Hello_World.md` and `/docs/05_Features.md` This will list *Hello World* before *Features*, overriding the default alpha-numeric sorting. The numbers will be stripped out of the navigation and urls.
+如果你需要对你的文件和文件夹进行排序,你可以为他们添加数字和下划线前缀, 例如: `/docs/01_Hello_World.md` 和 `/docs/05_Features.md` 这将会在*Features*之前列出 *Hello World* 从而覆盖了默认的字母数字排序顺序. 这些数字将会从导航和urls中剥离出去,不会显示.
 
 ## Landing page
 
-If you want to create a beautiful landing page for your project, simply create a `index.md` file in the root of the `/docs` folder. This file will then be used to create a landing page. You can also add a tagline and image to this page using the config file like this:
+如果你希望为你的项目创建一个漂亮的着陆页,只需要简单的创建一个`index.md` 文件在你的文档根目录`/docs` 中. 该文件将会被用于创建着陆页. 你还可以通过配置文件添加一个品牌口号和图片到该页面,配置如下:
 
 ```json
 {
 	"title": "Daux.io",
-	"tagline": "The Easiest Way To Document Your Project",
+	"tagline": "最简单的方式构建你的项目文档",
 	"image": "img/app.png"
 }
 ```
 
-Note: The image can be a local or remote image.
+提示:图像可以是本地图像或者远程图像.
 
-## Configuration
+## 配置
 
-To customize the look and feel of your documentation, you can create a `config.json` file in the of the `/docs` folder. The `config.json` file is a simple JSON object that you can use to change some of the basic settings of the documentation.
+你可以在文件夹`/docs`中创建`config.json`配置文件来定制项目文档的外观和感觉.  `config.json`配置文件是一个简单的JSON对象,你可以修改该文件来改变文档一些基础设置.
 
-###Title:
-Change the title bar in the docs
+###标题:
+在这些文档中修改标题栏
 
 ```json
 {
@@ -87,10 +96,10 @@ Change the title bar in the docs
 }
 ```
 
-###Docs Path:
-If you'd prefer to keep your docs outside of the Daux.io directory, you can provide the filepath.
+###文档路径:
+如果你更希望你的文档在Daux.io以外的文件夹,你可以提供一个文件路径在配置文件中.
 
-Note: Your `config.json` file will need to remain in `/daux.io/docs`.
+注意:你的配置文件 `config.json` 需要任然保存在目录 `/daux.io/docs`之下.
 
 ```json
 {
@@ -98,8 +107,8 @@ Note: Your `config.json` file will need to remain in `/daux.io/docs`.
 }
 ```
 
-###Themes:
-We have 4 built-in Bootstrap themes. To use one of the themes, just set the `theme` option to one of the following:
+###主题:
+我们提供了4中内置的Bootstrap主题样式. 如果要使用这些主题,仅仅需要在配置文档中,设置`theme`选项为以下值:
 
 * blue
 * green
@@ -112,8 +121,8 @@ We have 4 built-in Bootstrap themes. To use one of the themes, just set the `the
 }
 ```
 
-###Custom Theme:
-To create a custom color scheme, set the `theme` property to `custom` and then define the required colors. Copy the following configuration to get started:
+###用户定制:
+用户可以定制文档配色,通过设置设置 `theme` 属性 `custom` 然后再定义不同内容的颜色即可. 拷贝以下配置文件开始自定义文档配色:
 
 ```json
 {
@@ -133,16 +142,17 @@ To create a custom color scheme, set the `theme` property to `custom` and then d
 }
 ```
 
-###Code Floating:
-By default your code blocks will be floated to a column on the right side of your content. To disable this feature, set the `float` property to `false`.
+###代码悬浮:
+默认设置你的文档中的代码块会被悬浮于内容的右侧.(译者注:当屏幕超过1150px的时候) 如果需要关闭该特性,只需要设置 `float` 属性为 `false`.
 
 ```json
 {
 	"float": false
 }
 ```
-###Toggling Code Blocks
-Some users might wish to hide the code blocks & view just the documentation. By setting the `toggle_code` property to `true`, you can offer a toggle button on the page.
+
+###切换代码框显示
+有些用户希望只看文档而隐藏代码部分. 您可以设置 `toggle_code` 为 `true` 给他们选择的权利, 这时页面上将会多出一个切换按钮（译注：在导航的最下面，是个链接）.
 
 ```json
 {
@@ -150,9 +160,8 @@ Some users might wish to hide the code blocks & view just the documentation. By 
 }
 ```
 
-
-###GitHub Repo:
-Add a 'Fork me on GitHub' ribbon.
+###GitHub 版本控制:
+添加一个带有 'Fork me on GitHub'内容的横幅彩带的配置项如下:
 
 ```json
 {
@@ -161,7 +170,7 @@ Add a 'Fork me on GitHub' ribbon.
 ```
 
 ###Twitter:
-Include twitter follow buttons in the sidebar.
+包含twitter关注按钮在侧边栏.
 
 ```json
 {
@@ -169,8 +178,8 @@ Include twitter follow buttons in the sidebar.
 }
 ```
 
-###Links:
-Include custom links in the sidebar.
+###链接:
+包含用户定制链接在侧边栏配置如下:
 
 ```json
 {
@@ -182,7 +191,7 @@ Include custom links in the sidebar.
 }
 ```
 
-###File editor:
+###文件编辑器:
 ![File editor](https://f.cloud.github.com/assets/1788727/1954191/44358884-81d1-11e3-859d-254b9fb81808.png)
 
 Enable front-end Markdown editor. _Disabled by default_.
@@ -193,8 +202,8 @@ Enable front-end Markdown editor. _Disabled by default_.
 }
 ```
 
-###Google Analytics:
-This will embed the google analytics tracking code.
+###添加Google分析:
+这里将会嵌入Google分析跟踪码.
 
 ```json
 {
@@ -202,8 +211,8 @@ This will embed the google analytics tracking code.
 }
 ```
 
-###Piwik Analytics:
-This will embed the piwik tracking code.
+###Piwik分析:
+这里将会嵌入Piwik跟踪码.
 
 ```json
 {
@@ -211,16 +220,8 @@ This will embed the piwik tracking code.
 }
 ```
 
-You can Also give a specific Piwik ID as well.
-
-```json
-{
-	"piwik_analytics_id": "43"
-}
-```
-
-###Ignore:
-Set custom files and entire folders to ignore within your `/docs` folder. For files make sure to include the file extension in the name. For both files and folders, names are case-sensitive.
+###过滤忽视文件:
+设置忽略`/docs` 文件夹中特定的文件和文件夹 ,使其不显示在文档中. 对于文件,确保文件扩展名包含在配置文件中. 对于文件和文件夹,名字时大小写敏感的.
 
 ```json
 	{
@@ -231,8 +232,8 @@ Set custom files and entire folders to ignore within your `/docs` folder. For fi
 	}
 ```
 
-###Disabling clean URLs
-By default, Daux.io will create clean url's that do not include index.php. On servers running Apache, uploading the included .htaccess file should be enough for them to work properly. On servers that are not running Apache or that do not allow custom .htaccess files, you may need to disable clean_urls:
+###关闭URLs重写
+默认Daux.io将创建url重写,url中将不包含index.php. 如果服务器端运行的Apache,上传 .htaccess 文件,将会实现该url重写. 如果服务器端没有运行Apache或者不能自定义 .htaccess 文件, 你可能需要关闭clean_url功能,方法如下:
 
 ```json
 {
@@ -240,26 +241,25 @@ By default, Daux.io will create clean url's that do not include index.php. On se
 }
 ```
 
-###Date Modified
-By default, daux.io will display the last modified time as reported by the system underneath the title for each document. To disable this, change the option in your config.json to false.
+###日期修改
+默认daux.io将会显示最后更新时间在每个文档标题下面,该时间来自系统反馈. 关闭该功能,需要更改 config.json 中的date_modified选项为 false.
 
 ```json
 {
 	"date_modified": false
-}
+} 
 ```
 
-###Timezone
-If your server does not have a default timezone set in php.ini, it may return errors when it tries to generate the last modified date/time for docs. To fix these errors, specify a timezone in your config file. Valid options are available in the [PHP Manual](http://php.net/manual/en/timezones.php).
+###时区设置
+如果你的服务器没有在php.ini中设置默认时区,文档在获取最后修改日期时间时会返回错误. 修改该错误,需要在配置文件中指定时区. 有效的设置选项参考PHP手册 [PHP Manual](http://php.net/manual/en/timezones.php).
 
 ```json
 {
-        "timezone": "America/Los_Angeles"
+	"timezone": "America/Los_Angeles"
 }
-```
 
-###Multi-language
-Enables multi-language support which needs seperate directories for each language in `docs/` folder.
+###多语言
+开启多语言支持，在`docs/`目录下，请将每种语言的文件放入一个子目录.
 
 ```json
 {
@@ -267,7 +267,7 @@ Enables multi-language support which needs seperate directories for each languag
 }
 ```
 
-Directory structure:
+目录结构:
 ```
 ├── docs/
 │   ├── index.md
@@ -289,52 +289,52 @@ Directory structure:
 │   │   │   ├── 05_Code_Highlighting.md
 ```
 
-## Running Remotely
+## 远程托管运行
 
-Copy the files from the repo to a web server that can run PHP 5.3 or greater.
+从版本库复制文件到基于PHP5.3或更高的web服务器.
 
-## Running Locally
+## 本地运行
 
-There are several ways to run the docs locally. You can use something like <a href="http://www.mamp.info/en/index.html" target="_blank">MAMP</a> or <a href="http://www.wampserver.com/en/" target="_blank">WAMP</a>. If you are like me and use alot of Node.js and <a href="http://gruntjs.com/" target="_blank">Grunt.js</a>, then you can use the optional grunt command I have packaged with the project which will start a PHP web server for you in the project folder.
+这里有一些本地运行该文档生成器的方法. 你可以使用类似于<a href="http://www.mamp.info/en/index.html" target="_blank">MAMP</a> 或者 <a href="http://www.wampserver.com/en/" target="_blank">WAMP</a>的服务器集成架设软件. 如果你想我一样经常使用Node.js和 <a href="http://gruntjs.com/" target="_blank">Grunt.js</a>, 那么你可以使用我已经预先打包好的可选的grunt命令,它将会在项目文件夹中启动PHP web 服务器.
 
-The Grunt.js task uses the built in web server in PHP 5.4 to host the docs on your local machine. This is really only intended be used when you are writing/updating a ton of docs and want to preview the changes locally.
+Grunt.js将会利用内置的PHP 5.4 web服务器为你构建本地的文档. 这是仅仅为了被用于当你希望撰写或更新大量的文档并且仅仅希望本地查看其更改.
 
-**To use the optional Grunt command you will need:**
+**使用可选的Grunt命令,你需要:**
 
 * Node.js
 * npm
 * Grunt.js
-* PHP 5.4 or greater (This is because of the built-in web server packaged in 5.4)
+* PHP 5.4 或更高 (这是因为内置的web服务器使用5.4打包)
 
-This project contains a package.json file, so once you have the requirements installed, you can simply run a `npm install` and then `grunt` in the projects folder to start the local web server. By default the server will run at: <a href="http://localhost:8085" target="_blank">http://localhost:8085</a>
+该项目包含一个 package.json 文件, 所以一旦你的系统满足以上要求,你只需要运行命令`npm install` 然后在项目文件夹中进行 `grunt` 操作来启动本地web服务器. 默认的服务器地址为: <a href="http://localhost:8085" target="_blank">http://localhost:8085</a>
 
-## Generating a set of static files
+## 生成静态文件
 
-These can be uploaded to a static site hosting service such as pages.github.com
+可以将它们上传到提供静态托管服务的网站比如 pages.github.com
 
-Generating a complete set of pages, with navigation
+生成完整可独立浏览的页面, 并带有导航功能
 
 ```bash
 php index.php generate
 ```
 
-You can optionally pass the location of config.json and (also optionally) the output directory for the static file
+您也可以多传两个参数（都是可选的） 一个是配置文件 config.json 的路径，另一个是静态文件的输出目录
 
 ```bash
 php index.php generate '\path\to\config.json' 'out\dir'
 ```
-If the directory has a '\' at the beginning, it is treated as an absolute path, otherwise as relative to the Daux Directory.
+如果路径以 '\' 开头，那么它将被当作一个绝对路径，否则，就是的docx目录下的相对路径.
 
-## Running on IIS
+## 在IIS上运行
 
-If you have set up a local or remote IIS web site, you may need a `web.config` with:
+如果你已经建立的本地或远程的IIS web站点,你需要一个 `web.config` 文件包含以下内容:
 
-* A rewrite configuration, for handling clean urls.
-* A mime type handler for less files, if using a custom theme.
+* 一个rewrite配置,为了是urls更简洁,取消index.php.
+* 如果使用自定义样式,需要一个为处理less文件的mime类型的处理器.
 
-### Clean URLs
+### 整理 URLs
 
-The `web.config` needs an entry for `<rewrite>` under `<system.webServer>`:
+`web.config` 文件需要在`<system.webServer>`之下一个入口名为`<rewrite>`  :
 
 ```xml
 <configuration>
@@ -355,11 +355,11 @@ The `web.config` needs an entry for `<rewrite>` under `<system.webServer>`:
 </configuration>
 ```
 
-To use clean URLs on IIS 6, you will need to use a custom URL rewrite module, such as [URL Rewriter](http://urlrewriter.net/).
+在IIS6上使用整理URLs,你需要使用自定义的URL重写规则,例如[URL Rewriter](http://urlrewriter.net/).
 
 ### Less Mime Type
 
-The `web.config` needs a new `<mimeMap>` entry, under `<staticContent>` in `<system.webServer>`:
+`web.config` 文件需要一个新的 `<mimeMap>` 入口, 在  `<system.webServer>`中的`<staticContent>` 之下:
 
 ```xml
 <staticContent>
@@ -367,10 +367,11 @@ The `web.config` needs a new `<mimeMap>` entry, under `<staticContent>` in `<sys
 </staticContent>
 ```
 
-You will only need the mime map entry if you are using a custom theme and receive 404s for `.less` files.
+你将仅仅需要mine map入口,如果你正在使用自定义样式并且出现 `.less` 文件404s 错误.
 
-If you have a global mime map entry for `.less` files set for the server, you will receive an internal server (500) error for having duplicate mime map entries.
+如果你为服务器的`.less` 文件设置了全局的mime map入口,你将会收到一个内部服务的错误 internal server (500) error ,是因为mime map入口重复了.
 
-## Support
+## 支持
 
-If you need help using Daux.io, or have found a bug, please create an issue on the <a href="https://github.com/justinwalsh/daux.io/issues" target="_blank">GitHub repo</a>.
+如果你需要帮助关于使用Daux.io或者发现bug,请在Github上创建 issue 反馈,地址为<a href="https://github.com/justinwalsh/daux.io/issues" target="_blank">GitHub repo</a>.
+中文翻译issue反馈地址:<a href="https://github.com/xin-meng/daux/issues" target="_blank">Daux.io中文</a>.

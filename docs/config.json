@@ -1,19 +1,19 @@
 {
-	"title": "DAUX.IO",
-	"tagline": "The Easiest Way To Document Your Project",
+	"title": "docx文档生成工具",
+	"tagline": "最简单的方式构建你的项目文档",
 	"docs_path": "docs",
 	"image": "img/app.png",
-	"theme": "navy",
-	"template":"default",
+	"theme": "blue",
+	"template": "default",
+	"timezone": "Asia/Shanghai",
 	"toggle_code": true,
 	"date_modified": true,
-	"repo": "justinwalsh/daux.io",
-	"twitter": ["justin_walsh", "todaymade"],
-	"google_analytics": "UA-12653604-10",
+	"repo": "azhai/docx",
+	"google_analytics": "",
+	"clean_urls": false,
 	"links": {
-		"Download": "https://github.com/justinwalsh/daux.io/archive/master.zip",
-		"GitHub Repo": "https://github.com/justinwalsh/daux.io",
-		"Help/Support/Bugs": "https://github.com/justinwalsh/daux.io/issues",
-		"Made by Todaymade": "http://todaymade.com"
+		"GitHub仓库": "https://github.com/azhai/docx",
+		"Todaymade出品": "http://todaymade.com",
+		"Xin Meng汉化": "http://blog.emx2.co.uk"
 	}
 }

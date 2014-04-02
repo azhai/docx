@@ -54,7 +54,7 @@
                 exit;
             }
         }
-		if (!ini_get('date.timezone')) date_default_timezone_set('GMT');
+        if (!ini_get('date.timezone')) date_default_timezone_set('GMT');
         return $options;
     }
 
@@ -146,7 +146,7 @@
             $page['path'] = '';
             $page['markdown'] = '';
             $page['title'] = 'Oh No';
-            $page['content'] = "<h3>Oh No. That page doesn't exist</h3>";
+            $page['content'] = "<h3>抱歉，找不到页面~!</h3>";
             $options['file_editor'] = false;
         } else {
             $page['path'] = str_replace($docs_path . '/', "", $file);
