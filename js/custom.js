@@ -37,12 +37,12 @@ function toggleCodeBlocks() {
         $('#toggleCodeBlockBtn')[0].innerHTML = "隐藏代码框";
     } else {
         if (c.hasClass('hidden')) {
-            c.addClass('hidden');
-            $('#toggleCodeBlockBtn')[0].innerHTML = "外置代码框";
-        } else {
             d.addClass('float-view');
             c.removeClass('hidden');
             $('#toggleCodeBlockBtn')[0].innerHTML = "内嵌代码框";
+        } else {
+            c.addClass('hidden');
+            $('#toggleCodeBlockBtn')[0].innerHTML = "外置代码框";
         }
     }
 }

@@ -129,7 +129,7 @@
     <?php } else { ?>
         <!-- Docs -->
         <?php if ($options['repo']) { ?>
-            <a href="https://github.com/<?php echo $options['repo']; ?>" target="_blank" id="github-ribbon" class="hidden-print"><img src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+            <a href="https://github.com/<?php echo $options['repo']; ?>" target="_blank" id="github-ribbon" class="hidden-print"><img src="img/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
         <?php } ?>
         <div class="container-fluid fluid-height wrapper">
             <div class="navbar navbar-fixed-top hidden-print">
@@ -161,7 +161,7 @@
                                     <a href="<?php echo $url;?>" target="_blank"><?php echo $name;?></a><br>
                                 <?php } ?>
                                 <?php if ($options['toggle_code']) { ?>
-                                    <a href="#" id="toggleCodeBlockBtn" onclick="toggleCodeBlocks();">内嵌代码框</a><br>
+                                    <a href="#" id="toggleCodeBlockBtn" onclick="toggleCodeBlocks();">外置代码框</a><br>
                                 <?php } ?>
                                 <!-- Twitter -->
                                 <?php foreach($options['twitter'] as $handle) { ?>
@@ -254,7 +254,7 @@
     <script>hljs.initHighlightingOnLoad();</script>
 
     <!-- Navigation -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!--script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script-->
     <script>
     if (typeof jQuery == 'undefined')
         document.write(unescape("%3Cscript src='<?php echo $relative_base; ?>js/jquery-1.11.0.min.js' type='text/javascript'%3E%3C/script%3E"));

@@ -4,7 +4,7 @@
 
 ## 快速使用 （docx添加）
 
-* 下载最新的项目代码 [docx](http://daux.io)，解压后在命令行下进入目录docx
+* 下载最新的项目代码 [docx](https://github.com/azhai/docx/archive/master.zip)，解压后在命令行下进入目录docx
 * 如果操作系统是Linux/BSD/MacOS，设置index.php为可执行 chmod +x index.php
 * 使用 php index.php generate 生成静态文件
 * 将web服务器的文档目录设置为 docx/static ，打开浏览器查看网站
