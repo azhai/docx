@@ -33,8 +33,8 @@
             else {
                 if (empty($options['languages'])) return $base_doc;
                 else {
-                	$t = array_keys($base_doc);
-                	return $base_doc[$t[0]];
+                    $t = array_keys($base_doc);
+                    return $base_doc[$t[0]];
                 }
             }
         } else {
@@ -43,8 +43,10 @@
             foreach ($url as $part) {
                 if (isset($tree)) {
                     $dirs = array_keys($tree);
+                    $part = urldecode($part); //For another language (中文)
                     $key = array_search($part, array_map("clean_live", $dirs));
-                } else $key = FALSE;
+                } else 
+                    $key = FALSE;
                 if ($key === FALSE) {
                     return FALSE;
                 }

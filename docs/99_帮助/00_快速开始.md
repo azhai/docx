@@ -6,8 +6,7 @@
 
 * 下载最新的项目代码 [docx](https://github.com/azhai/docx/archive/master.zip)，解压后在命令行下进入目录docx
 * 如果操作系统是Linux/BSD/MacOS，设置index.php为可执行 chmod +x index.php
-* 使用 php index.php generate 生成静态文件
-* 将web服务器的文档目录设置为 docx/static ，打开浏览器查看网站
+* 将web服务器的文档目录设置为docx，打开浏览器查看网站，同时会生成静态页在static目录
 * 修改配置 docs/config.json，编辑docs目录*.md文档，重新生成静态文件
 
 ## 产品特征
