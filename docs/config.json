@@ -8,7 +8,7 @@
 	"template": "default",
 	"file_editor": true,
 	"toggle_code": true,
-	"float": true,
+	"float": false,
 	"timezone": "Asia/Shanghai",
 	"date_modified": true,
 	"date_format": "Y年n月j日 星期w",

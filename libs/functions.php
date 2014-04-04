@@ -19,7 +19,7 @@
             'date_modified' => true,
             'date_format' => 'D, Y-m-d',
             'author' => '',
-            'float' => true,
+            'float' => false,
             'repo' => false,
             'toggle_code' => false,
             'twitter' => array(),

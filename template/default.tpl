@@ -175,7 +175,7 @@
                         <?php } ?>
                     </div>
                 </div>
-                <div class="right-column <?php echo ($options['float']?'float-view':''); ?> content-area col-sm-9">
+                <div class="right-column content-area col-sm-9">
                     <div class="content-page">
                         <article>
                             <div class="page-header sub-header clearfix">

@@ -32,32 +32,16 @@ function toggleCodeBlocks() {
     var a = $('.content-page article');
     var c = a.children().filter('pre');
     var d = $('.right-column');
-    if (d.hasClass('float-view')) {
+    
+    if (c.hasClass('hidden')) {
+        c.removeClass('hidden');
+        $('#toggleCodeBlockBtn')[0].innerHTML = "外置代码框";
+    } else if (d.hasClass('float-view')) {
         d.removeClass('float-view');
-        $('#toggleCodeBlockBtn')[0].innerHTML = "隐藏代码框";
+        c.addClass('hidden');
+        $('#toggleCodeBlockBtn')[0].innerHTML = "内嵌代码框";
     } else {
-        if (c.hasClass('hidden')) {
-            d.addClass('float-view');
-            c.removeClass('hidden');
-            $('#toggleCodeBlockBtn')[0].innerHTML = "内嵌代码框";
-        } else {
-            c.addClass('hidden');
-            $('#toggleCodeBlockBtn')[0].innerHTML = "外置代码框";
-        }
+        d.addClass('float-view');
+        $('#toggleCodeBlockBtn')[0].innerHTML = "隐藏代码框";
     }
-}
-
-if (localStorage.getItem("toggleCodeStats") >= 0) {
-    var t = localStorage.getItem("toggleCodeStats");
-    if (t == 1) {
-        toggleCodeBlocks();
-        localStorage.setItem("toggleCodeStats", 1);
-    }
-    if (t == 2) {
-        toggleCodeBlocks();
-        toggleCodeBlocks();
-        localStorage.setItem("toggleCodeStats", 2);
-    }
-} else {
-    localStorage.setItem("toggleCodeStats", 0);
 }
