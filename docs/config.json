@@ -1,13 +1,17 @@
 {
 	"title": "docx文档生成工具",
 	"tagline": "最简单的方式构建你的项目文档",
+	"author": "",
 	"docs_path": "docs",
 	"image": "img/app.png",
 	"theme": "navy",
 	"template": "default",
-	"timezone": "Asia/Shanghai",
+	"file_editor": true,
 	"toggle_code": true,
+	"float": true,
+	"timezone": "Asia/Shanghai",
 	"date_modified": true,
+	"date_format": "Y年n月j日 星期w",
 	"repo": "azhai/docx",
 	"google_analytics": "",
 	"clean_urls": true,
@@ -15,5 +19,17 @@
 		"GitHub仓库": "https://github.com/azhai/docx",
 		"Todaymade出品": "http://todaymade.com",
 		"Xin Meng汉化": "http://blog.emx2.co.uk"
-	}
+	},
+	"greetings": [
+		"在合适的时候使用PHP – Rasmus Lerdorf",
+		"使用多表存储提高规模伸缩性 – Matt Mullenweg",
+		"千万不要相信用户 – Dave Child",
+		"多使用PHP缓存 – Ben Balbo",
+		"使用IDE, Templates和Snippets加速PHP开发 – Chad Kieffer",
+		"利用好PHP的过滤函数 – Joey Sochacki",
+		"使用PHP框架 – Josh Sharp",
+		"不要使用PHP框架 – Rasmus Lerdorf",
+		"使用批处理 – Jack D. Herrington",
+		"及时启用错误报告 – David Cummings"
+	]
 }

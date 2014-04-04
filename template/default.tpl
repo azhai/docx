@@ -40,7 +40,7 @@
                 <div class="container">
                     <a class="brand navbar-brand pull-left" href="<?php echo get_url('index'); ?>"><?php echo $options['title']; ?></a>
                     <p class="navbar-text pull-right">
-                        本文档使用 <a href="http://daux.io">Daux.io</a> 生成
+                        <?php echo rand_greeting(); ?>
                     </p>
                 </div>
         </div>
@@ -136,7 +136,7 @@
                 <div class="container-fluid">
                     <a class="brand navbar-brand pull-left" href="<?php echo get_url('index'); ?>"><?php echo $options['title']; ?></a>
                     <p class="navbar-text pull-right">
-                        本文档使用 <a href="http://daux.io">Daux.io</a> 生成
+                        <?php echo rand_greeting(); ?>
                     </p>
                 </div>
             </div>
@@ -154,7 +154,8 @@
                     <div id="sub-nav-collapse" class="sub-nav-collapse">
                         <!-- Navigation -->
                         <?php echo get_navigation($file); ?>
-                        <?php if (!empty($options['links']) || !empty($options['twitter'])) { ?>
+                        <?php if ($options['toggle_code'] 
+                                    || !empty($options['links']) || !empty($options['twitter'])) { ?>
                             <div class="well well-sidebar">
                                 <!-- Links -->
                                 <?php foreach($options['links'] as $name => $url) { ?>
@@ -177,36 +178,30 @@
                 <div class="right-column <?php echo ($options['float']?'float-view':''); ?> content-area col-sm-9">
                     <div class="content-page">
                         <article>
-                            <?php if($options['date_modified'] && isset($page['modified'])) { ?>
-                                <div class="page-header sub-header clearfix">
-                                    <h1><?php echo $page['title'];?>
-                                        <?php if ($mode === 'Live' && $options["file_editor"]) { ?>
-                                            <a href="javascript:;" id="editThis" class="btn">Edit this page</a>
-                                        <?php } ?>
-                                    </h1>
-                                        <span style="float: left; font-size: 10px; color: gray;">
-                                            <?php echo date("D, Y-m-d", $page['modified']);?>
-                                        </span>
-                                        <span style="float: right; font-size: 10px; color: gray;">
-                                            <?php echo date ("h:i", $page['modified']);?>
-                                        </span>
-                                </div>
-                            <?php } else { ?>
-                                <div class="page-header">
-                                    <h1><?php echo (isset($page['title']))?$page['title']:$options['title'];?></h1>
-                                        <?php if ($mode === 'Live' && $options["file_editor"]) { ?>
-                                            <a href="javascript:;" id="editThis" class="btn">Edit this page</a>
-                                        <?php } ?>
-                                    </h1>
-                                </div>
-                            <?php } ?>
+                            <div class="page-header sub-header clearfix">
+                                <h1><?php echo $page['title'];?>
+                                    <?php if ($mode === 'Live' && $options["file_editor"]) { ?>
+                                        <a href="javascript:;" id="editThis" class="btn">编辑文档</a>
+                                    <?php } ?>
+                                </h1>
+                                <span style="float: left; font-size: 10px; color: gray;">
+                                    <?php foreach($page['tags'] as $i => $tag) { 
+                                            echo ($i > 0) ? ', ' : '标签：'; ?>
+                                        <!--a href="<?php echo $relative_base .'tag/'. slugify($tag);?>"--><?php echo $tag;?><!--/a-->
+                                    <?php } ?>
+                                </span>
+                                <span style="float: right; font-size: 10px; color: gray;">
+                                    <!--a href="<?php echo $relative_base .'author/'. slugify($page['author']);?>"--><?php echo $page['author']; ?><!--/a--> 写于
+                                    <?php echo zh_date($options['date_format'], $page['created']); ?>
+                                </span>
+                            </div>
                             <?php echo $page['content']; ?>
                             <?php if ($mode === 'Live' && $options["file_editor"]) { ?>
                                 <div class="editor <?php if(!$options['date_modified']) { ?>paddingTop<?php } ?>">
-                                    <h3>You are editing <?php echo $page['path']; ?>&nbsp;<a href="javascript:;" class="closeEditor btn btn-warning">Close</a></h3>
+                                    <h3>正在修改 <?php echo $page['path']; ?>&nbsp;<a href="javascript:;" class="closeEditor btn btn-warning">关闭</a></h3>
                                     <div class="navbar navbar-inverse navbar-default navbar-fixed-bottom" role="navigation">
                                         <div class="navbar-inner">
-                                            <a href="javascript:;" class="save_editor btn btn-primary navbar-btn pull-right">Save file</a>
+                                            <a href="javascript:;" class="save_editor btn btn-primary navbar-btn pull-right">保存到文件</a>
                                         </div>
                                     </div>
                                     <textarea id="markdown_editor"><?php echo $page['markdown'];?></textarea>

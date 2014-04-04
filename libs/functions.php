@@ -1,11 +1,11 @@
 <?php
 
-    require_once(dirname( __FILE__)."/markdown_extended.php");
     $tree = array();
     $base = dirname(dirname(__FILE__));
     $options = get_options(isset($argv[2]) ? $argv[2] : '');
     $docs_path = $base . '/' . $options['docs_path'];
     $multilanguage = !empty($options['languages']) ? TRUE : FALSE;
+    $metakeys = array('layout','date','title','slug','author','category','tags','comments');
 
     //  Options
     function get_options($config_file) {
@@ -17,6 +17,8 @@
             'theme' => 'red',
             'docs_path' => 'docs',
             'date_modified' => true,
+            'date_format' => 'D, Y-m-d',
+            'author' => '',
             'float' => true,
             'repo' => false,
             'toggle_code' => false,
@@ -30,7 +32,8 @@
             'ignore' => array(),
             'languages' => array(),
             'file_editor' => false,
-            'template' => 'default'
+            'template' => 'default',
+            'greetings' => array()
         );
         // Load User Config
         $config_file = (($config_file === '') ? 'docs/config.json' : $config_file);
@@ -150,10 +153,11 @@
             $options['file_editor'] = false;
         } else {
             $page['path'] = str_replace($docs_path . '/', "", $file);
-            $page['markdown'] = file_get_contents($file);
-            $page['modified'] = filemtime($file);
-            $page['content'] = MarkDownExtended($page['markdown']);
             $page['title'] = clean_url($file, 'Title');
+            $page['created'] = $page['modified'] = filemtime($file);
+            $page['author'] = $options['author'];
+            $page['tags'] = array();
+            $page = parse_markdown($file, $page, 'markdown');
         }
         $relative_base = ($mode === 'Static') ? relative_path("", $file) : "http://" . $base_path . '/';
         ob_start();
@@ -226,6 +230,79 @@
         }
         $return .= clean_url($path1);
         return $return;
+    }
+    
+    //改写成适合的网址
+    function slugify($name) {
+        return strtolower(str_replace(' ', '-', $name));
+    }
+    
+    //随机显示一条语录
+    function rand_greeting() {
+        global $options;
+        static $index = 0;
+        if ($index === 0) {
+            shuffle($options['greetings']);
+            $index = count($options['greetings']);
+        }
+        return $options['greetings'][--$index];
+    }
+    
+    //中文格式化日期
+    function zh_date($format, $timestamp = false) {
+        $result = date($format, $timestamp);
+        if (strpos($format, '星期w') !== false) {
+            $weekdays = array('星期0'=>'星期日', '星期1'=>'星期一', '星期2'=>'星期二', 
+                '星期3'=>'星期三', '星期4'=>'星期四', '星期5'=>'星期五', '星期6'=>'星期六');
+            $result = str_replace(array_keys($weekdays), array_values($weekdays), $result);
+        }
+        return $result;
+    }
+    
+    //解析MetaData
+    function parse_metadata($line) {
+        global $metakeys;
+        $pieces = explode(':', $line);
+        if (count($pieces) === 2) {
+            $pieces[0] = strtolower(trim($pieces[0]));
+            if (in_array($pieces[0], $metakeys, true)) {
+                $pieces[1] = trim($pieces[1]);
+                return $pieces;
+            }
+        }
+    }
+    
+    //解析markdown文档
+    function parse_markdown($file, $result = null, $mdkey = 'origin') {
+        if (is_null($result)) {
+            $result = array();
+        }
+        $result[$mdkey] = file_get_contents($file); //全部内容用于编辑
+        //将MetaData和Content分开
+        $fh = fopen($file, 'rb');
+        $line = trim(fgets($fh) ?: '');
+        $line = preg_replace('{^\xEF\xBB\xBF|\x1A}', '', $line);
+        while ($meta = parse_metadata($line)) {
+            $result[$meta[0]] = $meta[1];
+            $line = trim(fgets($fh) ?: '');
+        }
+        $content = $line . fread($fh, filesize($file));
+        fclose($fh);
+        if (isset($result['tags']) && is_string($result['tags'])) {
+            $result['tags'] = array_map('trim', explode(',', $result['tags']));
+        }
+        //使用外部解析器解析内容
+        $parser_file_pd = dirname( __FILE__) . "/Parsedown.php";
+        $parser_file_mde = dirname( __FILE__) . "/markdown_extended.php";
+        if (is_readable($parser_file_pd)) {
+            require_once $parser_file_pd;
+            $parser = new Parsedown();
+            $result['content'] = $parser->parse($content);
+        } else if (is_readable($parser_file_mde)) {
+            require_once $parser_file_mde;
+            $result['content'] = MarkDownExtended($content);
+        }
+        return $result;
     }
 
 

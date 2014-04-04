@@ -14,29 +14,29 @@ $(document).ready(function() {
 
     save_editor.click(function() {
         var original_text = save_editor.text();
-        save_editor.text("Saving...").addClass("disabled");
+        save_editor.text("保存中...").addClass("disabled");
 
         $.post(window.location.href, {markdown: markdown_editor.val() }, function() {
-            save_editor.text("Done! Reloading page in 5 seconds. You can cancel it with ESC key");
+            save_editor.text("完成！3秒后刷新页面。您可以按 ESC 键取消刷新。");
 
             var timeout = setTimeout(function() {
                 location.reload()
-            }, 5000); // lie
+            }, 3000); // lie
 
             $(document).keyup(function(e) {
                 if (e.keyCode == 27) { // esc key
                     clearTimeout(timeout);
-                    save_editor.text("Page reload cancelled");
+                    save_editor.text("取消了刷新页面。");
                     setTimeout(function() {
                         save_editor.text(original_text).removeClass('disabled');
                     }, 2000);
                 }
             });
         }).fail(function() {
-            save_editor.removeClass('disabled').addClass("btn-danger").text("Failed :( - try checking your read/write permissions");
+            save_editor.removeClass('disabled').addClass("btn-danger").text("失败 :( - 请检查是否有读写此文件的权限。");
             setTimeout(function() {
                 save_editor.text(original_text).removeClass('btn-danger');
-            },5000);
+            }, 3000);
         });
     });
 });
