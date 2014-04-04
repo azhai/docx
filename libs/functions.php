@@ -5,7 +5,7 @@
     $options = get_options(isset($argv[2]) ? $argv[2] : '');
     $docs_path = $base . '/' . $options['docs_path'];
     $multilanguage = !empty($options['languages']) ? TRUE : FALSE;
-    $metakeys = array('layout','date','title','slug','author','category','tags','comments');
+    $metakeys = array('layout','date','created','title','slug','author','category','tags','comments');
 
     //  Options
     function get_options($config_file) {
@@ -154,7 +154,7 @@
         } else {
             $page['path'] = str_replace($docs_path . '/', "", $file);
             $page['title'] = clean_url($file, 'Title');
-            $page['created'] = $page['modified'] = filemtime($file);
+            $page['date'] = $page['modified'] = filemtime($file);
             $page['author'] = $options['author'];
             $page['tags'] = array();
             $page = parse_markdown($file, $page, 'markdown');
@@ -290,6 +290,9 @@
         fclose($fh);
         if (isset($result['tags']) && is_string($result['tags'])) {
             $result['tags'] = array_map('trim', explode(',', $result['tags']));
+        }
+        if (isset($result['date']) && !is_numeric($result['date'])) {
+            $result['date'] = strtotime($result['date']);
         }
         //使用外部解析器解析内容
         $parser_file_pd = dirname( __FILE__) . "/Parsedown.php";

@@ -192,7 +192,7 @@
                                 </span>
                                 <span style="float: right; font-size: 10px; color: gray;">
                                     <!--a href="<?php echo $relative_base .'author/'. slugify($page['author']);?>"--><?php echo $page['author']; ?><!--/a--> 写于
-                                    <?php echo zh_date($options['date_format'], $page['created']); ?>
+                                    <?php echo zh_date($options['date_format'], $page['date']); ?>
                                 </span>
                             </div>
                             <?php echo $page['content']; ?>
