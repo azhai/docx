@@ -4,6 +4,7 @@
     $base = dirname(dirname(__FILE__));
     $options = get_options(isset($argv[2]) ? $argv[2] : '');
     $docs_path = $base . '/' . $options['docs_path'];
+    $output_path = $base . '/' . $options['static_path'];
     $multilanguage = !empty($options['languages']) ? TRUE : FALSE;
     $metakeys = array('layout','date','created','title','slug','author','category','tags','comments');
 
@@ -16,7 +17,10 @@
             'reading' => "开始阅读文档",
             'image' => false,
             'theme' => 'red',
+            'template' => 'default',
+            'layout' => 'post',
             'docs_path' => 'docs',
+            'static_path' => 'static',
             'file_desc' => false,
             'date_modified' => true,
             'date_format' => 'D, Y-m-d',
@@ -34,7 +38,6 @@
             'ignore' => array(),
             'languages' => array(),
             'file_editor' => false,
-            'template' => 'default',
             'greetings' => array()
         );
         // Load User Config
@@ -113,15 +116,17 @@
     }
 
     function build_navigation($tree, $current_dir, $url) {
-        global $mode, $base_path, $docs_path, $options;
+        global $mode, $base_path, $docs_path, $output_path, $options;
         $return = "";
-        if ($mode === 'Static') 
+        if ($mode === 'Static') {
             $t = relative_path($current_dir . "/.", $url) . '/';
-        else {
+            $file_path = str_replace($output_path, $docs_path, $current_dir);
+        } else {
             $t = "http://" . $base_path . '/';
             if (!$options['clean_urls']) $t .= 'index.php?';
             $rel = clean_url($current_dir, 'Live');
             $t .= ($rel === '') ? '' : $rel . '/';
+            $file_path = $docs_path . '/' . $current_dir;
         }
         foreach ($tree as $key => $node)
             if (is_array($node)) {
@@ -138,11 +143,12 @@
                 $return .= "</li>";
             }
             else {
+                $file = $file_path . '/' . $node;
                 $return .= "<li";
                 if ($url === $current_dir . '/' . $node) $return .= " class=\"active\"";
                 $return .= ">";
                 $link = $t . clean_url($node, $mode);
-                $return .= "<a href=\"" . $link . "\">" . clean_url($node, "Title");
+                $return .= "<a href=\"" . $link . "\">" . clean_url($node, 'Title', $file);
                 $return .= "</a></li>";
             }
         return $return;
@@ -164,10 +170,10 @@
             $page['date'] = $page['modified'] = filemtime($file);
             $page['author'] = $options['author'];
             $page['tags'] = array();
-            $page = parse_markdown($file, $page, 'markdown');
+            $page = parse_markdown($file, $page, false);
         }
         $homepage = ($filename = substr(strrchr($file, "/"), 1)) === 'index.md';
-        $template_name = $homepage ? 'home' : 'doc';
+        $template_name = $homepage ? 'home' : $options['layout'];
         $relative_base = ($mode === 'Static') ? relative_path("", $file) : "http://" . $base_path . '/';
         ob_start();
         include($base . "/template/" . $template . "/" . $template_name . ".tpl");
@@ -177,7 +183,7 @@
     }
 
     //  File to URL
-    function clean_url($url, $mode = 'Static') {
+    function clean_url($url, $mode = 'Static', $file = false) {
         global $docs_path, $output_path, $options;
         switch ($mode) {
             case 'Live':
@@ -196,6 +202,12 @@
                 $url = implode('/', $url);
                 return $url;
             case 'Title':
+                if ($file) {
+                    $title = parse_markdown($file, null, 'title');
+                    if ($title) {
+                        return $title;
+                    }
+                }
             case 'Filename':
                 $t = substr_count($url, '/');
                 if ($t > 0) $url = substr(strrchr($url, "/"), 1);
@@ -282,21 +294,27 @@
     }
     
     //解析markdown文档
-    function parse_markdown($file, $result = null, $mdkey = 'origin') {
+    function parse_markdown($file, $result = null, $meta_name = false) {
         if (is_null($result)) {
             $result = array();
         }
-        $result[$mdkey] = file_get_contents($file); //全部内容用于编辑
         //将MetaData和Content分开
         $fh = fopen($file, 'rb');
         $line = trim(fgets($fh) ?: '');
         $line = preg_replace('{^\xEF\xBB\xBF|\x1A}', '', $line);
+        $metadata = $line . "\n";
         while ($meta = parse_metadata($line)) {
             $result[$meta[0]] = $meta[1];
             $line = trim(fgets($fh) ?: '');
+            $metadata .= $line . "\n";
+        }
+        if ($meta_name) { //只需要metadata
+            fclose($fh);
+            return $meta_name === '*' ? $result : $result[$meta_name];
         }
         $content = $line . fread($fh, filesize($file));
         fclose($fh);
+        //规范化元素和内容
         if (isset($result['tags']) && is_string($result['tags'])) {
             $result['tags'] = array_map('trim', explode(',', $result['tags']));
         }
@@ -314,6 +332,8 @@
             require_once $parser_file_mde;
             $result['content'] = MarkDownExtended($content);
         }
+        $result['metadata'] = $metadata;
+        $result['markdown'] = $content;
         return $result;
     }
 

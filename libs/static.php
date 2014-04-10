@@ -4,7 +4,8 @@
     function generate_static($out_dir) {
         global $tree, $base, $docs_path, $output_path, $options, $mode, $multilanguage, $output_language;
         $mode = 'Static';
-        if ($out_dir === '') $output_path = $base . '/static';
+        if ($out_dir === '') 
+            $output_path = $base . '/' . $options['static_path'];
         else {
             if (substr($out_dir, 0, 1) !== '/') $output_path = $base . '/' . $out_dir;
             else $output_path = $out_dir;
