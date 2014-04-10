@@ -1,4 +1,4 @@
-最简单的方式构建你的项目文档
+# 最简单的方式构建你的项目文档
 
 **Daux.io** 是一个文档生成器,可以帮助用户快速生成漂亮的项目文档，此外，用户还可以通过简单的文件结构和Markdown文件来创建自定义格式的文档。 它可以帮助你使用对于开发更加友好的方式创建文档。
 
@@ -8,6 +8,21 @@
 * 如果操作系统是Linux/BSD/MacOS，设置index.php为可执行 chmod +x index.php
 * 将web服务器的文档目录设置为docx，打开浏览器查看网站，同时会生成静态页在static目录
 * 修改配置 docs/config.json，编辑docs目录*.md文档，重新生成静态文件
+
+## 2014-04-10 Update
+
+在Markdown中增加Metadata，支持设置文档标题和slug和时间等。
+
+可设置文档模板layout，支持文件倒序排列，可作为静态博客使用。Metadata类似这样：
+
+```
+layout:     post
+date:       2014-04-08
+title:      快速开始
+slug:       getting-started
+tags:       帮助, 快速开始
+comments:   false
+```
 
 ## 产品特征
 
