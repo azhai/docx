@@ -7,12 +7,15 @@
         if ($out_dir === '') 
             $output_path = $base . '/' . $options['static_path'];
         else {
-            if (substr($out_dir, 0, 1) !== '/') $output_path = $base . '/' . $out_dir;
-            else $output_path = $out_dir;
+            if (substr($out_dir, 0, 1) !== '/') 
+                $output_path = $base . '/' . $out_dir;
+            else 
+                $output_path = $out_dir;
         }
-        clean_copy_assets($output_path);
+        clean_copy_assets($output_path, '.git');
         build_tree();
-        if (!$multilanguage) generate_static_branch($tree, '');
+        if (!$multilanguage) 
+            generate_static_branch($tree, '');
         else
             foreach ($options['languages'] as $languageKey => $language) {
                 $output_language = $languageKey;
@@ -43,23 +46,37 @@
     }
 
     //  Rmdir
-    function clean_directory($dir) {
+    function clean_directory($dir, $exculde = false) {
+        global $output_path;
+        $output_path_len = strlen(rtrim($output_path, DIRECTORY_SEPARATOR)) + 1;
         $it = new RecursiveDirectoryIterator($dir);
         $files = new RecursiveIteratorIterator($it,
                      RecursiveIteratorIterator::CHILD_FIRST);
         foreach($files as $file) {
-            if ($file->getFilename() === '.' || $file->getFilename() === '..') continue;
-            if ($file->isDir()) rmdir($file->getRealPath());
-            else unlink($file->getRealPath());
+            $filename = $file->getFilename();
+            if ($filename === '.' || $filename === '..')
+                continue;
+            if ($exculde !== false) {
+                if (starts_with($filename, $exculde))
+                    continue;
+                //绝对路径转相对路径
+                $subpath = substr($file->getRealPath(), $output_path_len);
+                if (starts_with($subpath, $exculde))
+                    continue;
+            }
+            if ($file->isDir()) 
+                rmdir($file->getRealPath());
+            else 
+                unlink($file->getRealPath());
         }
     }
 
     //  Copy Local Assets
-    function clean_copy_assets($path){
+    function clean_copy_assets($path, $exculde = false){
         @mkdir($path);
         $options = $GLOBALS["options"];
         //Clean
-        clean_directory($path);
+        clean_directory($path, $exculde);
         //Copy assets
         $unnecessaryImgs = array('./img/favicon.png', './img/favicon-blue.png', './img/favicon-green.png', './img/favicon-navy.png', './img/favicon-red.png');
         $unnecessaryJs = array();

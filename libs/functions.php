@@ -117,16 +117,15 @@
 
     function build_navigation($tree, $current_dir, $url) {
         global $mode, $base_path, $docs_path, $output_path, $options;
+        $file_path = str_replace($output_path, $docs_path, $current_dir);
         $return = "";
         if ($mode === 'Static') {
             $t = relative_path($current_dir . "/.", $url) . '/';
-            $file_path = str_replace($output_path, $docs_path, $current_dir);
         } else {
             $t = "http://" . $base_path . '/';
             if (!$options['clean_urls']) $t .= 'index.php?';
             $rel = clean_url($current_dir, 'Live');
             $t .= ($rel === '') ? '' : $rel . '/';
-            $file_path = $docs_path . '/' . $current_dir;
         }
         foreach ($tree as $key => $node)
             if (is_array($node)) {
@@ -251,6 +250,13 @@
         }
         $return .= clean_url($path1);
         return $return;
+    }
+    
+    //开始的字符串相同
+    function starts_with($haystack, $needle)
+    {
+        return $needle === "" || substr_compare($haystack, $needle, 0, strlen($needle))
+        === 0;
     }
     
     //改写成适合的网址
