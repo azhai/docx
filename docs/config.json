@@ -1,8 +1,10 @@
 {
 	"title": "docx文档生成工具",
 	"tagline": "最简单的方式构建你的项目文档",
+	"reading": "开始阅读文档",
 	"author": "",
 	"docs_path": "docs",
+	"file_desc": false,
 	"image": "img/app.png",
 	"theme": "navy",
 	"template": "default",

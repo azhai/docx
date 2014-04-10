@@ -11,11 +11,13 @@
     function get_options($config_file) {
         global $base;
         $options = array(
-            'title' => "Documentation",
+            'title' => "我的文档",
             'tagline' => false,
+            'reading' => "开始阅读文档",
             'image' => false,
             'theme' => 'red',
             'docs_path' => 'docs',
+            'file_desc' => false,
             'date_modified' => true,
             'date_format' => 'D, Y-m-d',
             'author' => '',
@@ -64,7 +66,8 @@
     //  Build Directory Tree
     function build_tree() {
         global $tree, $options, $docs_path , $multilanguage, $output_language;
-        if (!$multilanguage) $tree = directory_tree($docs_path, $options['ignore']);
+        if (!$multilanguage) 
+            $tree = directory_tree($docs_path, $options['ignore']);
         else
             foreach ($options['languages'] as $languageKey => $language) {
                 $output_language = $languageKey;
@@ -74,22 +77,28 @@
 
     //  Recursively add files & directories to Tree
     function directory_tree($dir, $ignore) {
-        global $base_doc, $multilanguage, $output_language;
-        $tree = array();
+        global $options, $base_doc, $multilanguage, $output_language;
         $Item = array_diff(scandir($dir), array(".", "..", "index.md"));
-        foreach ($Item as $key => $value) {
+        $tree = array();
+        $files = array();
+        foreach ($Item as $value) {
             if (is_dir($dir . '/' . $value)) {
                 if (!in_array($value, $ignore['folders']))
                     $tree[$value] = directory_tree($dir . '/' . $value, $ignore);
             } else if (!in_array($value, $ignore['files'])) {
-                    if (substr($value, -3) === ".md") {
-                        $tree[$value] = $value;
-                        if ($multilanguage)
-                            $base_doc[$output_language] = isset($base_doc[$output_language]) ? $base_doc[$output_language] : $dir . '/' . $value;
-                        else $base_doc = isset($base_doc) ? $base_doc : $dir . '/' . $value;
-                    }
+                if (substr($value, -3) === ".md") {
+                    $files[$value] = $value;
+                    if ($multilanguage)
+                        $base_doc[$output_language] = isset($base_doc[$output_language]) ? $base_doc[$output_language] : $dir . '/' . $value;
+                    else 
+                        $base_doc = isset($base_doc) ? $base_doc : $dir . '/' . $value;
                 }
+            }
         }
+        if ($options['file_desc']) {
+            krsort($files); //对文件倒序排列
+        }
+        $tree = array_merge($tree, $files);
         return $tree;
     }
 
@@ -106,7 +115,8 @@
     function build_navigation($tree, $current_dir, $url) {
         global $mode, $base_path, $docs_path, $options;
         $return = "";
-        if ($mode === 'Static') $t = relative_path($current_dir . "/.", $url) . '/';
+        if ($mode === 'Static') 
+            $t = relative_path($current_dir . "/.", $url) . '/';
         else {
             $t = "http://" . $base_path . '/';
             if (!$options['clean_urls']) $t .= 'index.php?';
@@ -142,9 +152,6 @@
     function generate_page($file) {
         global $base, $base_doc, $base_path, $docs_path, $options, $mode, $relative_base;
         $template = $options['template'];
-        $filename = substr(strrchr($file, "/"), 1);
-        if ($filename === 'index.md') $homepage = TRUE;
-        else $homepage = FALSE;
         if (!$file) {
             $page['path'] = '';
             $page['markdown'] = '';
@@ -159,9 +166,11 @@
             $page['tags'] = array();
             $page = parse_markdown($file, $page, 'markdown');
         }
+        $homepage = ($filename = substr(strrchr($file, "/"), 1)) === 'index.md';
+        $template_name = $homepage ? 'home' : 'doc';
         $relative_base = ($mode === 'Static') ? relative_path("", $file) : "http://" . $base_path . '/';
         ob_start();
-        include($base . "/template/" . $template . ".tpl");
+        include($base . "/template/" . $template . "/" . $template_name . ".tpl");
         $return = ob_get_contents();
         @ob_end_clean();
         return $return;
