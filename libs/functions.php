@@ -16,14 +16,14 @@
             'tagline' => false,
             'reading' => "开始阅读文档",
             'image' => false,
-            'theme' => 'red',
+            'theme' => 'navy',
             'template' => 'default',
             'layout' => 'post',
             'docs_path' => 'docs',
             'static_path' => 'static',
             'file_desc' => false,
             'date_modified' => true,
-            'date_format' => 'D, Y-m-d',
+            'date_format' => 'Y-m-d, 星期w',
             'author' => '',
             'float' => false,
             'repo' => false,
@@ -31,7 +31,7 @@
             'twitter' => array(),
             'links' => array(),
             'colors' => false,
-            'clean_urls' => true,
+            'clean_urls' => false,
             'google_analytics' => false,
             'piwik_analytics' => false,
             'piwik_analytics_id' => 1,
@@ -186,6 +186,7 @@
         global $docs_path, $output_path, $options;
         switch ($mode) {
             case 'Live':
+                $url = to_utf8_if_need($url); //转换路径中的中文
                 $url = str_replace(array(".md", ".html", ".php"), "", $url);
             case 'Static':
                 $url = str_replace(".md", ".html", $url);
@@ -207,6 +208,7 @@
                         return $title;
                     }
                 }
+                $url = to_utf8_if_need($url); //转换路径中的中文
             case 'Filename':
                 $t = substr_count($url, '/');
                 if ($t > 0) $url = substr(strrchr($url, "/"), 1);
@@ -225,8 +227,12 @@
         global $mode, $options, $relative_base;
         $t = clean_url($url, $mode);
         if ($t === 'index') {
-            if ($mode === 'Static') return $relative_base . 'index.html';
-            else return $relative_base;
+            if ($mode === 'Static') 
+                return $relative_base . 'index.html';
+            else if ($options['clean_urls'])
+                return $relative_base;
+            else 
+                return rtrim($relative_base, '/') . '/index.php';
         }
         if ($mode === 'Live' && !$options['clean_urls']) $t = 'index.php?' . $t;
         return $t;
@@ -250,6 +256,31 @@
         }
         $return .= clean_url($path1);
         return $return;
+    }
+    
+    //含有非ASCII字符
+    function has_non_ascii($word)
+    {
+        return preg_match('![^\x20-\x7f]!', $word);
+    }
+    
+    //将中文内容转为UTF-8
+    function to_utf8($word)
+    {
+        if (function_exists('mb_convert_encoding')) {
+            return mb_convert_encoding($word, 'UTF-8', 'UTF-8, GBK');
+        } else if (function_exists('iconv')) {
+            return iconv('GBK', 'UTF-8', $word);
+        }
+    }
+    
+    //智能地将中文内容转为UTF-8
+    function to_utf8_if_need($word)
+    {
+        if (trim($word) !== '' && has_non_ascii($word)) { //含有中文需要处理
+            $word = to_utf8($word);
+        }
+        return $word;
     }
     
     //开始的字符串相同

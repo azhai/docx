@@ -49,32 +49,31 @@
     function clean_directory($dir, $exculde = false) {
         global $output_path;
         $output_path_len = strlen(rtrim($output_path, DIRECTORY_SEPARATOR)) + 1;
-        $it = new RecursiveDirectoryIterator($dir);
-        $files = new RecursiveIteratorIterator($it,
+        $iterator = new RecursiveDirectoryIterator($dir,
+                        RecursiveDirectoryIterator::SKIP_DOTS);
+        $items = new RecursiveIteratorIterator($iterator,
                      RecursiveIteratorIterator::CHILD_FIRST);
-        foreach($files as $file) {
-            $filename = $file->getFilename();
-            if ($filename === '.' || $filename === '..')
-                continue;
+        foreach($items as $item) {
+            $filename = $item->getFilename();
             if ($exculde !== false) {
                 if (starts_with($filename, $exculde))
                     continue;
                 //绝对路径转相对路径
-                $subpath = substr($file->getRealPath(), $output_path_len);
+                $subpath = substr($item->getRealPath(), $output_path_len);
                 if (starts_with($subpath, $exculde))
                     continue;
             }
-            if ($file->isDir()) 
-                rmdir($file->getRealPath());
+            if ($item->isDir()) 
+                rmdir($item->getRealPath());
             else 
-                unlink($file->getRealPath());
+                unlink($item->getRealPath());
         }
     }
 
     //  Copy Local Assets
     function clean_copy_assets($path, $exculde = false){
+        global $base, $options;
         @mkdir($path);
-        $options = $GLOBALS["options"];
         //Clean
         clean_directory($path, $exculde);
         //Copy assets
@@ -85,10 +84,12 @@
             copy_recursive('./less', $path.'/', $unnecessaryLess);
             $unnecessaryImgs = array_diff($unnecessaryImgs, array('./img/favicon.png'));
         } else {
+            $theme = $options['theme'];
             $unnecessaryJs = array('./js/less.min.js');
             @mkdir($path.'/css');
-            @copy('./css/daux-'.$options['theme'].'.min.css', $path.'/css/daux-'.$options['theme'].'.min.css');
-            $unnecessaryImgs = array_diff($unnecessaryImgs, array('./img/favicon-'.$options['theme'].'.png'));
+            //在其他目录执行generate
+            @copy($base . '/css/daux-'.$theme.'.min.css', $path.'/css/daux-'.$theme.'.min.css');
+            $unnecessaryImgs = array_diff($unnecessaryImgs, array('./img/favicon-'.$theme.'.png'));
         }
         copy_recursive('./img', $path.'/', $unnecessaryImgs);
         copy_recursive('./js', $path.'/', $unnecessaryJs);
@@ -97,15 +98,21 @@
 
     //  Copy Recursive
     function copy_recursive($source, $dest, $ignoreList = array()) {
-        $src_folder=str_replace(array('.','/'), '', $source);
+        global $base;
+        $src_folder = str_replace(array('.','/'), '', $source);
         @mkdir($dest . '/' . $src_folder);
-        foreach (
-            $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::SELF_FIRST) as $item
-        ) {
-            if ($item->isDir()) @mkdir($dest . '/' . $src_folder . '/' .$iterator->getSubPathName());
-            else if (!$ignoreList || !in_array($item, $ignoreList)) @copy($item, $dest . '/' .$src_folder. '/' .$iterator->getSubPathName());
+        if (substr($source, 0, 2) === './') { //在其他目录执行generate
+            $source = $base . '/' . $source;
+        }
+        $iterator = new RecursiveDirectoryIterator($source,
+                        RecursiveDirectoryIterator::SKIP_DOTS);
+        $items = new RecursiveIteratorIterator($iterator,
+                     RecursiveIteratorIterator::SELF_FIRST);
+        foreach($items as $item) {
+            if ($item->isDir()) 
+                @mkdir($dest . '/' . $src_folder . '/' . $iterator->getSubPathName());
+            else if (!$ignoreList || !in_array($item, $ignoreList)) 
+                @copy($item, $dest . '/' . $src_folder. '/' . $iterator->getSubPathName());
         }
     }
 
