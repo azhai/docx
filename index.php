@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /*
 
@@ -28,62 +29,38 @@ GitHub issue tracker:
 
 https://github.com/justinwalsh/daux.io/issues
 
-Bugs
-----
-
-To file bug reports please create an issue using the github issue tracker:
-
-https://github.com/justinwalsh/daux.io/issues
-
-
-Copyright and License
----------------------
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-*   Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer.
-
-*   Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
-
-This software is provided by the copyright holders and contributors "as
-is" and any express or implied warranties, including, but not limited
-to, the implied warranties of merchantability and fitness for a
-particular purpose are disclaimed. In no event shall the copyright owner
-or contributors be liable for any direct, indirect, incidental, special,
-exemplary, or consequential damages (including, but not limited to,
-procurement of substitute goods or services; loss of use, data, or
-profits; or business interruption) however caused and on any theory of
-liability, whether in contract, strict liability, or tort (including
-negligence or otherwise) arising in any way out of the use of this
-software, even if advised of the possibility of such damage.
-
 */
+
+
 require_once dirname( __FILE__ ) . '/libs/functions.php';
 $command_line=FALSE;
 if(isset($argv)){
     require_once dirname( __FILE__ ) . '/libs/static.php';
     define("CLI",TRUE);
-    echo 'Daux.io documentation generator'."\n";
 
     if(!isset($argv[1]))
         $argv[1]= 'help';
 
     switch ($argv[1]) {
-        //Generate static web documentation
+        case 'gen':
         case 'generate':
+            echo utf8_to_locale('正在生成静态网页…') . "\n";
             generate_static((isset($argv[3])) ? $argv[3] : '');
-            echo "Finished\n";
-            echo "The documentation is generated in static folder\n";
+            echo utf8_to_locale('成功！生成的网页在静态目录下。') . "\n";
+            break;
+        case 'pdf':
+            echo utf8_to_locale('正在生成PDF……') . "\n";
+            $pdf = isset($argv[2]) ? $argv[2] : 'docx.pdf';
+            $pdf = generate_pdf($pdf, array_slice($argv, 3));
+            echo utf8_to_locale('成功！生成的PDF文件为') . $pdf . "\n";
             break;
         default:
             echo "\n";
-            echo 'Usage:'."\n";
-            echo ' php index.php generate'."\n";
-            echo 'Generate static web'."\n";
+            echo utf8_to_locale('用法:')."\n";
+            echo 'php index.php gen'."\n";
+            echo '  ' . utf8_to_locale('生成静态网页')."\n";
+            echo 'php index.php pdf [docx.pdf] [subdir1] [subdir2] [...]'."\n";
+            echo '  ' . utf8_to_locale('生成PDF文件')."\n";
             echo "\n";
             break;
     }

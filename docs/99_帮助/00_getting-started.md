@@ -6,6 +6,7 @@ tags:       帮助, 快速开始
 comments:   false
 
 最简单的方式构建你的项目文档
+------------------------------
 
 **Daux.io** 是一个文档生成器,可以帮助用户快速生成漂亮的项目文档，此外，用户还可以通过简单的文件结构和Markdown文件来创建自定义格式的文档。 它可以帮助你使用对于开发更加友好的方式创建文档。
 
@@ -16,7 +17,41 @@ comments:   false
 * 将web服务器的文档目录设置为docx，打开浏览器查看网站，同时会生成静态页在static目录
 * 修改配置 docs/config.json，编辑docs目录*.md文档，重新生成静态文件
 
-## 2014-04-10 Update
+### Windows下安装使用
+
+* 在电脑上安装PHP环境，推荐使用[Uniform Server Macro](http://sourceforge.net/projects/miniserver/files/MiniServer/PHP_MiniServer/)，直接解压到D:\盘，双击运行D:\UniServerMicro\phpMiniServer1.exe
+* 下载[docx最新的源码](http://git.oschina.net/azhai/docx/branches/recent)，解压到UniServerMacro\www\目录下，在浏览器地址栏输入 http://localhost/docx/ 就可以看到了。
+* 进入UniServerMacro\www\docx\docs\，修改config.json文件中的配置；修改封面index.md；在目录下增/删/改其他markdown文件（用法请参考帮助或者git.oschina.net）。
+* 生成静态网页，请在DOS命令行下进入UniServerMacro\www\docx\，输入php index.php gen，将会在static目录下生成完整可浏览的静态网站。
+* 生成PDF文件，首先需要安装[WkHtmlToPdf](http://wkhtmltopdf.org/downloads.html)，安装时选择安装到D:\Program Files\目录下，修改docx\docs\config.json文件中的wkhtmltopdf项为"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf",同上进入命令行下，输入php index.php pdf，生成好的pdf文件在static\docx.pdf
+* 如果作为静态博客使用，先要安装[git](http://git-scm.com/download/win)，上面第二步下载docx的源码我们使用git来完成，原始md文档我们也用git进行版本管理。静态博客，国外有github.com和bitbucket.org，国内有gitcafe.com和stdyun.net。gitcafe的操作请参考[Pages-相关帮助](https://gitcafe.com/GitCafe/Help/wiki/Pages-%E7%9B%B8%E5%85%B3%E5%B8%AE%E5%8A%A9#wiki)。现在由命令行下进入UniServerMacro\www\开始操作：
+    ```bash
+    #第一次使用git时设置
+    git config --global user.name "Ryan Liu"
+    git config --global user.email "azhaixxx@126.com"
+    #下载源码
+    git clone http://git.oschina.net/azhai/docx.git
+    #将原始md文档纳入新的版本库管理
+    cd docx\docs\
+    git init
+    cd ..\..
+    #以下为管理静态博客，以gitcafe为例，先去申请一个帐号，并建立一个同名项目
+    #参考其网站上的帮助，拿到pages项目地址
+    rm -rf static
+    git submodule add -f https://gitcafe.com/azhai/azhai.git static
+    cd static
+    git checkout -b gitcafe-pages
+    php ..\index.php gen
+    git add .
+    git commit -a -m '第一次生成静态博客'
+    git push -u origin gitcafe-pages
+    ```
+
+### 2014-04-12 Update
+
+增加PDF输出功能，需要安装WkHtmlToPdf
+
+### 2014-04-10 Update
 
 在Markdown中增加Metadata，支持设置文档标题和slug和时间等。
 

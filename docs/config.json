@@ -18,7 +18,8 @@
 	"date_format": "Y年n月j日 星期w",
 	"repo": "azhai/docx",
 	"google_analytics": "",
-	"clean_urls": true,
+	"clean_urls": false,
+	"wkhtmltopdf": "C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf",
 	"links": {
 		"GitHub仓库": "https://github.com/azhai/docx",
 		"Todaymade出品": "http://todaymade.com",

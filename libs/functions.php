@@ -1,4 +1,5 @@
 <?php
+    defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 
     $tree = array();
     $base = dirname(dirname(__FILE__));
@@ -12,33 +13,34 @@
     function get_options($config_file) {
         global $base;
         $options = array(
-            'title' => "我的文档",
-            'tagline' => false,
-            'reading' => "开始阅读文档",
-            'image' => false,
-            'theme' => 'navy',
-            'template' => 'default',
-            'layout' => 'post',
-            'docs_path' => 'docs',
-            'static_path' => 'static',
-            'file_desc' => false,
+            'title' => "我的文档", #站名
+            'tagline' => false, #封面宣言
+            'reading' => "开始阅读文档", #封面阅读按钮上的文字
+            'image' => false, #封面正中间大图
+            'theme' => 'navy', #css主题
+            'template' => 'default', #模板集合
+            'layout' => 'post', #默认布局
+            'docs_path' => 'docs', #原始文档目录
+            'static_path' => 'static', #静态输出目录
+            'file_desc' => false, #文件倒序排列，用于博客
             'date_modified' => true,
             'date_format' => 'Y-m-d, 星期w',
-            'author' => '',
-            'float' => false,
-            'repo' => false,
-            'toggle_code' => false,
+            'author' => '', #默认作者
+            'float' => false, #代码框外置
+            'repo' => false, #github仓库url
+            'toggle_code' => false, #代码框切换
             'twitter' => array(),
-            'links' => array(),
-            'colors' => false,
-            'clean_urls' => false,
+            'links' => array(), #友情链接
+            'colors' => false, #多色主题
+            'clean_urls' => false, #url美化，需要开启Apache/Nginx的Rewrite功能
             'google_analytics' => false,
             'piwik_analytics' => false,
             'piwik_analytics_id' => 1,
             'ignore' => array(),
+            'wkhtmltopdf' => null, #pdf工具路径
             'languages' => array(),
-            'file_editor' => false,
-            'greetings' => array()
+            'file_editor' => false, #使用内容编辑器
+            'greetings' => array(), #供随机展示的语录
         );
         // Load User Config
         $config_file = (($config_file === '') ? 'docs/config.json' : $config_file);
@@ -121,6 +123,8 @@
         $return = "";
         if ($mode === 'Static') {
             $t = relative_path($current_dir . "/.", $url) . '/';
+        } else if ($mode === 'PDF') {
+            $t = "#";
         } else {
             $t = "http://" . $base_path . '/';
             if (!$options['clean_urls']) $t .= 'index.php?';
@@ -154,9 +158,8 @@
     }
 
     //  Generate Documentation from Markdown file
-    function generate_page($file) {
+    function generate_page($file, $tplname = false) {
         global $base, $base_doc, $base_path, $docs_path, $options, $mode, $relative_base;
-        $template = $options['template'];
         if (!$file) {
             $page['path'] = '';
             $page['markdown'] = '';
@@ -172,10 +175,15 @@
             $page = parse_markdown($file, $page, false);
         }
         $homepage = ($filename = substr(strrchr($file, "/"), 1)) === 'index.md';
-        $template_name = $homepage ? 'home' : $options['layout'];
-        $relative_base = ($mode === 'Static') ? relative_path("", $file) : "http://" . $base_path . '/';
+        $relative_base = ($mode === 'Static' || $mode === 'PDF') 
+                        ? relative_path("", $file)
+                        : "http://" . $base_path . '/';
+        $template = ($mode === 'PDF') ? 'pdf' : $options['template'];
+        if (empty($tplname)) {
+            $tplname = $homepage ? 'home' : $options['layout'];
+        }
         ob_start();
-        include($base . "/template/" . $template . "/" . $template_name . ".tpl");
+        include($base . "/template/" . $template . "/" . $tplname . ".tpl");
         $return = ob_get_contents();
         @ob_end_clean();
         return $return;
@@ -201,6 +209,7 @@
                 }
                 $url = implode('/', $url);
                 return $url;
+            case 'PDF':
             case 'Title':
                 if ($file) {
                     $title = parse_markdown($file, null, 'title');
@@ -227,7 +236,7 @@
         global $mode, $options, $relative_base;
         $t = clean_url($url, $mode);
         if ($t === 'index') {
-            if ($mode === 'Static') 
+            if ($mode === 'Static' || $mode === 'PDF') 
                 return $relative_base . 'index.html';
             else if ($options['clean_urls'])
                 return $relative_base;
@@ -274,6 +283,16 @@
         }
     }
     
+    //将UTF-8中文内容转为GBK
+    function to_gbk($word)
+    {
+        if (function_exists('mb_convert_encoding')) {
+            return mb_convert_encoding($word, 'GBK', 'UTF-8, GBK');
+        } else if (function_exists('iconv')) {
+            return iconv('UTF-8', 'GBK//IGNORE', $word);
+        }
+    }
+    
     //智能地将中文内容转为UTF-8
     function to_utf8_if_need($word)
     {
@@ -281,6 +300,12 @@
             $word = to_utf8($word);
         }
         return $word;
+    }
+    
+    //将UTF8转为本地语言
+    function utf8_to_locale($word)
+    {
+        return (DS === '/') ? $word : to_gbk($word);
     }
     
     //开始的字符串相同
@@ -330,6 +355,37 @@
         }
     }
     
+    //将tree改写为扁平化
+    function flatten_subtree($subtree, $prefix = '') {
+        $files = array();
+        foreach ($subtree as $key => $node) {
+            if (is_array($node)) {
+                $node_files = flatten_subtree ($node, $prefix . '/' . $key);
+                $files = array_merge($files, $node_files);
+            } else {
+                $files[] = $prefix . '/' . $node;
+            }
+        }
+        return $files;
+    }
+    
+    //过滤文件
+    function filter_subdirs($all_files, array $subdirs) {
+        foreach ($subdirs as $i => $subdir) {
+            $subdirs[$i] = '/' . trim($subdir, '/'). '/';
+        }
+        $files = array();
+        foreach ($all_files as $file) {
+            foreach ($subdirs as $subdir) {
+                if (starts_with($file, $subdir)) {
+                    $files[] = $file;
+                    continue;
+                }
+            }
+        }
+        return $files;
+    }
+    
     //解析markdown文档
     function parse_markdown($file, $result = null, $meta_name = false) {
         if (is_null($result)) {
@@ -337,6 +393,9 @@
         }
         //将MetaData和Content分开
         $fh = fopen($file, 'rb');
+        if ($fh === false) { //打开失败
+            return $result;
+        }
         $line = trim(fgets($fh) ?: '');
         $line = preg_replace('{^\xEF\xBB\xBF|\x1A}', '', $line);
         $metadata = $line . "\n";

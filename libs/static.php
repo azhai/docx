@@ -1,6 +1,40 @@
 <?php
+    defined('DS') or define('DS', DIRECTORY_SEPARATOR);
+    
+    // 生成PDF文件
+    function generate_pdf($pdf_filename, array $subdirs = array()) {
+        global $base, $tree, $docs_path, $output_path, $options, $mode;
+        $mode = 'PDF';
+        $pdflib_file = dirname( __FILE__) . "/WkHtmlToPdf.php";
+        if (!is_readable($pdflib_file)) {
+            return false;
+        }
+        require_once $pdflib_file;
+        $pdf = new WkHtmlToPdf(array(
+            'binPath' => $options['wkhtmltopdf'],
+            'encoding' => 'UTF-8',
+        ));
+        build_tree();
+        $files = flatten_subtree($tree);
+        if ($subdirs) {
+            $files = filter_subdirs($files, $subdirs);
+        }
+        //$html = generate_page($docs_path . '/index.md', 'pdf');
+        //$pdf->addCover($html);
+        $html = generate_page($docs_path . '/index.md', 'catalog');
+        $pdf->addPage($html);
+        foreach ($files as $file) {
+            $html = generate_page($docs_path . $file);
+            $pdf->addPage($html, array(
+                //'user-style-sheet' => $base . '/css/daux-navy.min.css',
+            ));
+        }
+        $save_filename = $output_path . '/' . $pdf_filename;
+        $pdf->saveAs($save_filename, true); //忽略错误
+        return str_replace('/', DS, $save_filename);
+    }
 
-    //  Generate Static Documentation
+    // Generate Static Documentation
     function generate_static($out_dir) {
         global $tree, $base, $docs_path, $output_path, $options, $mode, $multilanguage, $output_language;
         $mode = 'Static';
@@ -38,7 +72,8 @@
         }
         if (!is_dir($p)) @mkdir($p);
         foreach ($tree as $key => $node)
-            if (is_array($node)) generate_static_branch($node, $current_dir . $key);
+            if (is_array($node)) 
+                generate_static_branch($node, $current_dir . $key);
             else {
                 $html = generate_page($docs_path . '/' . $current_dir . $node);
                 file_put_contents($p . "/" . clean_url($node), $html);
@@ -48,7 +83,7 @@
     //  Rmdir
     function clean_directory($dir, $exculde = false) {
         global $output_path;
-        $output_path_len = strlen(rtrim($output_path, DIRECTORY_SEPARATOR)) + 1;
+        $output_path_len = strlen(rtrim($output_path, DS)) + 1;
         $iterator = new RecursiveDirectoryIterator($dir,
                         RecursiveDirectoryIterator::SKIP_DOTS);
         $items = new RecursiveIteratorIterator($iterator,
