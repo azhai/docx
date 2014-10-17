@@ -40,6 +40,12 @@
     git push -u origin gitcafe-pages
     ```
 
+### 2014-10-16 Refactor
+
+重构代码，改为独立的几个类，并可使用压缩后的库文件。
+
+原来的命令行操作，除了git外，也都移到WEB管理页面。
+
 ### 2014-04-12 Update
 
 增加PDF输出功能，需要安装WkHtmlToPdf
