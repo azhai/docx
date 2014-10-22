@@ -12,6 +12,7 @@
 class DOCX_Cache
 {
     protected $data = null;
+    protected $changed = null;
     protected $path = '';
     protected $reader = null;
     protected $writer = null;
@@ -47,23 +48,28 @@ class DOCX_Cache
     
     public function close()
     {
-        if (empty($this->signature) || $this->signature !== $this->sign()) {
+        if ($this->isChanged()) {
             $this->save();
         }
         unset($this->data);
     }
     
-    public function offsetGet($offset)
+    public function sign()
     {
-        if(isset($this->data[$offset])) {
-            return $this->data[$offset];
+        if ($this->data instanceof DOCX_Array) {
+            return;
+        } else {
+            return serialize($this->data);
         }
     }
     
-    public function offsetSet($offset, & $value)
+    public function isChanged()
     {
-        $this->data[$offset] = $value;
-        return $this;
+        if (! is_null($this->changed)) {
+            return $this->changed;
+        } else {
+            return $this->signature !== $this->sign();
+        }
     }
     
     public function setPath($path)
@@ -102,17 +108,16 @@ class DOCX_Cache
         return $this->writer;
     }
     
-    public function sign()
-    {
-        return serialize($this->data);
-    }
-    
-    public function load()
+    public function load(& $changed = null)
     {
         if ($reader = $this->getReader()) {
             $data = $reader->read($this->path);
             if (! is_null($data)) {
                 $this->data = $data;
+            }
+            if (! is_null($changed)) {
+                $this->changed = & $changed;
+            } else {
                 $this->signature = $this->sign();
             }
         }
@@ -125,5 +130,18 @@ class DOCX_Cache
             $writer->write($this->path, $this->data);
         }
         return $this->data;
+    }
+    
+    public function offsetGet($offset)
+    {
+        if(isset($this->data[$offset])) {
+            return $this->data[$offset];
+        }
+    }
+    
+    public function offsetSet($offset, & $value)
+    {
+        $this->data[$offset] = $value;
+        return $this;
     }
 }

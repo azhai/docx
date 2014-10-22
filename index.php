@@ -8,14 +8,13 @@ $settings = array(
     "reading" => "开始阅读文档",
     'cover_image' => 'img/cover.png',
     'author' => 'Ryan Liu',
-    'url_prefix' => '/docx',
     'cache_ext' => '.json',
-    'file_sort_latest' => array(),
+    'blog_sorting' => array(),
     #需要安装wkhtmltopdf、fontconfig、一款中文字体如文泉驿
     #'wkhtmltopdf' => 'wkhtmltopdf',
     'repo' => 'azhai/docx',
     'links' => array(
-        'OSChina仓库' => 'http://git.oschina.net/azhai/docx/',
+        'Coding仓库' => 'https://coding.net/u/azhai/p/docx/git',
         "Todaymade出品" => 'http://todaymade.com',
         "Xin Meng汉化" => 'http://blog.emx2.co.uk'
     ),

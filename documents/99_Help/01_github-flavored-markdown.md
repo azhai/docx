@@ -1,8 +1,8 @@
 layout:     post
 date:       2014-04-08
-title:      GitHub 风格 Markdown
+title:      Markdown 语法
 slug:       github-flavored-markdown
-tags:       帮助, github, markdown
+tags:       帮助, markdown, github
 comments:   false
 
 让我从"linebreak" 开始. 下面的段落包含两个短语并且用单行分割.

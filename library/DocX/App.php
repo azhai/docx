@@ -11,39 +11,41 @@
  */
 class DOCX_App
 {
+    const URL_TYPE_QUERY = 0;       //参数
+    const URL_TYPE_TAIL = 1;        //地址
+    const URL_TYPE_REWRITE = 2;     //重写
+    const URL_TYPE_AUTO = 9;        //根据url_prefix判断
     const HOME_PAGE_URL = '/index';
     const ADMIN_URLPRE = '/admin';
-    const URLEXT = '{DOCX_URL_EXT}';
-    const HTML_HIDE = '{DOCX_HTML_HIDDEN}';
-    
-    protected $parsers = array();
-    protected $templater = null;
-    protected $documents = null;
-    protected $document_dir = '';
-    protected $protected_dir = '';
-    protected $cache_dir = '';
-    protected $curr_metas = array();
-    protected $curr_url = '';
+
+    public $document_dir = '';
+    public $public_dir = '';
+    public $cache_dir = '';
+    protected $abs_prefix = false;
+    protected $url_type = self::URL_TYPE_AUTO;
+    protected $offset = 0;
+    protected $route = 'r';
+    protected $docs_dir = null;
     protected $toppest_url = '';
-    protected $edit_mode = false;
-    
     protected $options = array(
+        'url_prefix' => '/index.php',       #首页网址
+        'url_type' => self::URL_TYPE_AUTO,  #网址类型
         'title' => "我的文档",              #站名
         'tagline' => false,                 #封面宣言
-        'reading' => "开始阅读文档",          #封面阅读按钮上的文字
+        'reading' => "开始阅读文档",        #封面阅读按钮上的文字
         'cover_image' => '',                #封面图片
         'author' => '',                     #默认作者
-        'url_prefix' => '',                 #首页网址
+        'layout' => 'post',                 #默认模板布局
         'document_dir' => 'documents',      #原始文档目录
         'public_dir' => 'public',           #静态输出目录
         'theme_dir' => 'theme',             #主题模板目录
-        'assets_dir' => 'assets',            #资源目录
+        'assets_dir' => 'theme/assets',     #资源目录
         'cache_dir' => 'cache',
         'cache_ext' => '.json',
-        'urlext_php' => '',                #动态网页扩展名
+        'urlext_php' => '/',                #动态网页扩展名
         'urlext_html' => '.html',           #静态网页扩展名
         'timezone' => 'Asia/Shanghai',
-        'file_sort_latest' => array(),      #文件按更新时间排列，用于博客
+        'blog_sorting' => array(),          #文件按更新时间排列，用于博客
         'date_format' => 'Y年n月j日 星期w',
         'repo' => false,                    #github仓库url
         'links' => array(),                 #友情链接
@@ -59,238 +61,204 @@ class DOCX_App
         if (is_array($options)) {
             $this->options = array_merge($this->options, $options);
         }
-        $this->document_dir = APP_ROOT  . '/' . trim($this->options['document_dir'], ' /');
-        $this->public_dir = APP_ROOT  . '/' . trim($this->options['public_dir'], ' /');
-        $this->cache_dir = APP_ROOT  . '/' . trim($this->options['cache_dir'], ' /');
-    }
-
-    public static function isPost()
-    {
-        return strtoupper($_SERVER['REQUEST_METHOD']) === 'POST';
+        $this->document_dir = APP_ROOT  . '/' . trim($this->getOption('document_dir'), ' /');
+        $this->public_dir = APP_ROOT  . '/' . trim($this->getOption('public_dir'), ' /');
+        $this->cache_dir = APP_ROOT  . '/' . trim($this->getOption('cache_dir'), ' /');
+        $this->abs_prefix = $this->getAbsPrefix();
     }
 
     public static function isHome($slug)
     {
         return $slug === 'home';
     }
-    
-    protected static function getRawCurrURL()
+
+    public static function getRawURL()
     {
         $raw_url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        return is_null($raw_url) ? '' : $raw_url;
+        return is_null($raw_url) ? '/' : urldecode($raw_url); //汉字逆向转码
+    }
+    
+    public function getConstant($name)
+    {
+        return constant(__CLASS__ . '::' . $name);
+    }
+    
+    public function getOption($key = false)
+    {
+        if ($key === false) {
+            return array_merge($this->options, $_ENV);
+        } else if (isset($_ENV[$key])) {
+            return $_ENV[$key];
+        } else if (isset($this->options[$key])) {
+            return $this->options[$key];
+        }
     }
 
-    public static function getURLPre($url, $tpl_file = 'post.php')
+    public function getAbsPrefix()
     {
-        $offset = ($tpl_file === 'edit.php') ? 1 : 0;
-        /*if ($tpl_file !== 'index.php') {
-            $curr_url = self::getRawCurrURL();
-            $offset += (ends_with($curr_url, '/') ? 1 : 0);
-        }*/
-        $depth = substr_count(trim($url, '/'), '/') + intval($offset);
+        if ($this->abs_prefix !== false) {
+            return $this->abs_prefix;
+        }
+        $this->url_type = intval($this->getOption('url_type'));
+        $this->abs_prefix = rtrim($this->getOption('url_prefix'), '/');
+        $url_types = array(
+            self::URL_TYPE_QUERY, self::URL_TYPE_TAIL, self::URL_TYPE_REWRITE
+        );
+        if (! in_array($this->url_type, $url_types)) { //根据网址前缀判断类型
+            $this->url_type = $this->fixURLType();
+        }
+        return $this->abs_prefix;
+    }
+    
+    public function fixURLType()
+    {
+        $position = strpos($this->abs_prefix, 'index.php');
+        if ($position === false) {
+            $this->url_type = self::URL_TYPE_REWRITE;
+            $this->abs_prefix = rtrim($this->abs_prefix, '/');
+        } else {
+            $pattern = '/^\?([^=?&]+)=/';
+            $query = substr($this->abs_prefix, $position + strlen('index.php'));
+            if (preg_match($pattern, $query, $matches)) {
+                $this->url_type = self::URL_TYPE_QUERY;
+                $this->route = $matches[0];
+            } else {
+                $this->url_type = self::URL_TYPE_TAIL;
+            }
+            $this->abs_prefix = rtrim($this->abs_prefix, '?&');
+        }
+        return $this->url_type;
+    }
+
+    public function getCurrURL($rstrip = false)
+    {
+        $raw_url = self::getRawURL();
+        if ($this->url_type === self::URL_TYPE_QUERY) {
+            $curr_url = '';
+            if (isset($_GET[$this->route])) {
+                $curr_url = '/' . trim($_GET[$this->route], '/') . '/';
+            }
+            $this->offset = - 99;
+        } else {
+            if ($this->url_type === self::URL_TYPE_REWRITE) {
+                $raw_url = str_replace('/index.php', '/', $raw_url);
+                $this->offset = - 1;
+            }
+            $prelen = strlen($this->getAbsPrefix());
+            //substr()陷阱，当string的长度等于start，将返回FALSE而不是''
+            $curr_url = (strlen($raw_url) > $prelen) ? substr($raw_url, $prelen) : '';
+        }
+        return $rstrip ? rtrim($curr_url, '/') : $curr_url;
+    }
+    
+    public function getURLJoin()
+    {
+        if ($this->url_type === self::URL_TYPE_QUERY && ! empty($_GET)) {
+            $query = urldecode(http_build_query($_GET));
+            return "?$query&";
+        } else {
+            return '?';
+        }
+    }
+
+    public function getRelPrefix($curr_url = false)
+    {
+        if ($curr_url === false) {
+            if ($this->url_type === self::URL_TYPE_QUERY) {
+                return '.';
+            }
+            $curr_url = $this->getCurrURL(false);
+            $depth = substr_count($curr_url, '/') + $this->offset;
+        } else {
+            $depth = substr_count($curr_url, '/');
+        }
         return ($depth > 0) ? rtrim(str_repeat('../', $depth), '/') : '.';
     }
 
-    protected function getCurrURL()
+    public function getDocsDir()
     {
-        if (empty($this->curr_url)) {
-            $curr_url = substr(self::getRawCurrURL(), strlen($this->options['url_prefix']));
-            $curr_url = rtrim(str_replace('/index.php', '', $curr_url), ' /');
-            if ($curr_url === self::ADMIN_URLPRE) {
-                $this->edit_mode = true;
-            } else if (starts_with($curr_url, self::ADMIN_URLPRE . '/')) {
-                $this->edit_mode = true;
-                //substr()陷阱，当string的长度等于start，将返回FALSE而不是''
-                $curr_url = substr($curr_url, strlen(self::ADMIN_URLPRE));
+        if (is_null($this->docs_dir)) {
+            $cache_file = $this->cache_dir . '/docs' . $this->getOption('cache_ext');
+            $this->docs_dir = new DOCX_Directory($this->document_dir, '.md');
+            if ($order_dirs = $this->getOption('blog_sorting')) {
+                $this->docs_dir->setSorting($order_dirs, DOCX_Directory::ATTR_FILE_MTIME, true);
             }
-            if (empty($curr_url) || $curr_url === '/') {
-                $this->curr_url = self::HOME_PAGE_URL;
-            } else {
-                $this->curr_url = urldecode(rtrim($curr_url, '/')); //汉字逆向转码
+            $diffs = $this->docs_dir->addCache($cache_file)->getDiffs();
+            $this->updateMetas($diffs['addfiles']);
+            $this->updateMetas($diffs['modfiles']);
+        }
+        return $this->docs_dir;
+    }
+
+    public function updateMetas($diffs)
+    {
+        foreach ($diffs as $dir => $files) {
+            foreach ($files as $file) {
+                $metadata = & $this->docs_dir->files[$dir][$file];
+                $metadata['slug'] = $file;
+                $metadata['url'] = ltrim($dir, '.') . '/' . $file;
+                $markdoc = DOCX_Markdoc::getInstance($metadata['fname']);
+                $metadata = array_merge($metadata, $markdoc->getMetaData());
             }
         }
-        return $this->curr_url;
-    }
-    
-    public function isEditMode()
-    {
-        return $this->edit_mode;
     }
 
-    public function getDocuments()
-    {
-        if (is_null($this->documents)) {
-            $cache_file = $this->cache_dir . '/docs' . $this->options['cache_ext'];
-            $this->documents = new DOCX_Directory($this->document_dir, '.md');
-            $this->documents->addCache($cache_file)->getFiles();
-        }
-        return $this->documents;
-    }
-
-    public function ensureAssets()
-    {
-        $assets_dir = $this->public_dir . '/' . $this->options['assets_dir'];
-        if (! file_exists($assets_dir)) { //复制资源文件
-            $cmd = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'xcopy' : 'cp -r';
-            $source_dir = APP_ROOT . '/' . $this->options['assets_dir'];
-            @shell_exec($cmd . ' ' . $source_dir . ' ' . $this->public_dir . '/');
-        }
-    }
-
-    public function getTemplater()
-    {
-        if (is_null($this->templater)) {
-            $this->ensureAssets();
-            $theme_dir = APP_ROOT . '/' . trim($this->options['theme_dir'], ' /');
-            $this->templater = new DOCX_Templater($theme_dir, $this->cache_dir);
-            $this->templater->globals = array(
-                'urlext' => self::URLEXT,
-                'html_hide' => self::HTML_HIDE,
-                'home_url' => self::HOME_PAGE_URL,
-                'admin_urlpre' => self::ADMIN_URLPRE,
-                'options' => & $this->options,
-            );
-        }
-        return $this->templater;
-    }
-
-    public function getParser($url)
-    {
-        if (! isset($this->parsers[$url])) {
-            $this->parsers[$url] = new DOCX_Parser();
-        }
-        return $this->parsers[$url];
-    }
-    
-    public function getMetadata($find_url, $metakey = false)
+    public function getMetadata($find_url)
     {
         if ($find_url === self::ADMIN_URLPRE) {
             $find_url = self::HOME_PAGE_URL;
         }
         $dir = '.' . rtrim(dirname($find_url), '/');
         $file = basename($find_url);
-        $docs = $this->getDocuments();
-        if (isset($docs->files[$dir]) && isset($docs->files[$dir][$file])) {
-            $metadata = $docs->files[$dir][$file];
-            if ($metakey === false) {
-                return $metadata; //metadata数组
-            } else if (isset($metadata[$metakey])) {
-                return $metadata[$metakey]; //metadata其中一个元素
-            }
+        $docsdir = $this->getDocsDir();
+        if (isset($docsdir->files[$dir]) && isset($docsdir->files[$dir][$file])) {
+            return $docsdir->files[$dir][$file];
         }
     }
-    
-    public function genMetas($find_url = false)
+
+    public function dispatch()
     {
-        if ($find_url === false || $find_url === self::ADMIN_URLPRE) {
-            $find_url = self::HOME_PAGE_URL;
+        $curr_url = $this->getCurrURL(true);
+        $edit_mode = false;
+        if (empty($curr_url) || in_array($curr_url, array('/', self::HOME_PAGE_URL))) {
+            $curr_url = self::HOME_PAGE_URL;
+        } else if ($curr_url === self::ADMIN_URLPRE) {
+            $curr_url = self::HOME_PAGE_URL;
+            $edit_mode = true;
+        } else if (starts_with($curr_url, self::ADMIN_URLPRE . '/')) {
+            //substr()陷阱，当string的长度等于start，将返回FALSE而不是''
+            $curr_url = substr($curr_url, strlen(self::ADMIN_URLPRE));
+            $edit_mode = true;
         }
-        $result = array();
-        $docs = $this->getDocuments();
-        foreach ($docs->files as $dir => & $files) {
-            foreach ($files as $file => & $metas) {
-                $url = ltrim($dir, '.') . '/' . $file;
-                $parser = $this->getParser($url);
-                $metadata = $parser->parseMetaData($metas['fname']);
-                $metas['url'] = $url;
-                $metas['html'] = $this->public_dir . $url . '.html';
-                $metas['slug'] = $file;
-                $metas = array_merge($metas, $metadata);
-                if ($find_url === $url) {
-                    $result = $metas;
-                }
-            }
+        $metadata = $this->getMetadata($curr_url);
+        if (is_null($metadata)) { //找不到页面，或者URL不正确
+            die($curr_url);
         }
-        return $result;
+        $view = new DOCX_View($this, $metadata, '', $edit_mode);
+        return $view;
     }
-    
+
     public function run()
     {
         $action = isset($_GET['action']) ? $_GET['action'] : false;
         if ($action === 'cleancache') {
             DOCX_Directory::removeAll($this->cache_dir, array('.'));
         } else if ($action === 'staticize') {
-            $this->curr_metas = $this->genMetas($this->getCurrURL());
             $this->genPages();
+            return http_redirect($this->getStaticIndex());
         } else if ($action === 'genpdf') {
             $pdf = $this->genPDF();
-            $pdf->send('docx.pdf', true);
+            return $pdf->send($this->getOption('title') . '.pdf', true);
         }
-        
-        if (! $this->curr_metas) {
-            $this->curr_metas = $this->genMetas($this->getCurrURL());
-            //$this->curr_metas = $this->getMetadata($this->getCurrURL(), false);
-        }
-        $edit_mode = $this->isEditMode();
-        if (self::isHome($this->curr_metas['slug'])) {
-            $tpl_file = $edit_mode ? 'admin.php' : 'index.php';
-            $content = $this->showPage($tpl_file, ! $edit_mode);
-        } else if (! $edit_mode) {
-            $content = $this->showPage('post.php', true);
-        } else {
-            if (self::isPost()) {
-                $doc_file = $this->curr_metas['fname'];
-                $doc = $_POST['metatext'] . "\n\n" . trim($_POST['markdown']);
-                file_put_contents($doc_file, $doc, LOCK_EX);
-                $content = $this->renderPage($this->curr_metas, 'post.php');
-                $this->staticize($this->curr_metas['html'], $content);
-            } else {
-                $content = $this->renderPage($this->curr_metas, 'edit.php');
-            }
-            $content = $this->replaceURL($content);
-        }
-        @header('Content-Type: text/html; charset=utf8');
-        return die($content);
+        $this->dispatch()->output();
     }
     
-    public function replaceURL($content)
+    public function getStaticIndex()
     {
-        return str_replace(self::URLEXT, $this->options['urlext_php'], $content);
-    }
-    
-    public function staticize($html_file, $content)
-    {
-        if (! $content) {
-            return;
-        }
-        @mkdir(dirname($html_file), 0755, true);
-        $urlext_html = $this->options['urlext_html'];
-        $html_hide = '{display: none}';
-        $content = str_replace(array(self::URLEXT, self::HTML_HIDE), array($urlext_html, $html_hide), $content);
-        return file_put_contents($html_file, $content, LOCK_EX);
-    }
-
-    public function showPage($tpl_file = 'post.php', $staticize = false)
-    {
-        if (! $this->curr_metas) {
-            $this->curr_metas = $this->getMetadata($this->getCurrURL(), false);
-        }
-        $content = $this->renderPage($this->curr_metas, $tpl_file);
-        if ($staticize) {
-            $html_file = $this->public_dir . rtrim($this->getCurrURL(), '/') . '.html';
-            $this->staticize($html_file, $content);
-        }
-        return $this->replaceURL($content);
-    }
-        
-    public function renderPage(array& $metas, $tpl_file = 'post.php')
-    {
-        $parser = $this->getParser($metas['url']);
-        $page = $parser->parseAll($metas['fname']);
-        $first_page_url = '';
-        if ($tpl_file === 'index.php' || $tpl_file === 'admin.php') {
-            $first_page_url = $this->getToppestPage();
-        }
-        $docs = $this->getDocuments();
-        $templater = $this->getTemplater();
-        $templater->globals['docs'] = & $docs->files;
-        $urlpre = self::getURLPre($metas['url'], $tpl_file);
-        $content = $templater->render($tpl_file, array(
-            'page' => $page, 'curr_url' => $metas['url'],
-            'urlpre' => $urlpre, 'first_page_url' => $first_page_url,
-            'assets_url' => $urlpre . '/' . $this->options['assets_dir'],
-        ), true);
-        return $content;
+        $rel_prefix = $this->getRelPrefix();
+        $public_dir = trim($this->getOption('public_dir'), ' /');
+        $urlext = $this->getOption('urlext_html');
+        return $rel_prefix . '/' . $public_dir . '/index' . $urlext;
     }
 
     public function getToppestPage()
@@ -298,36 +266,39 @@ class DOCX_App
         if (! empty($this->toppest_url)) {
             return $this->toppest_url;
         }
-        $docs = $this->getDocuments();
-        foreach ($docs->files as $dir => & $files) {
-            foreach ($files as $file => & $metas) {
-                if (! self::isHome($metas['slug'])) { //不是home的第一个页面
-                    return $metas['url'];
+        $docsdir = $this->getDocsDir();
+        foreach ($docsdir->files as $dir => & $files) {
+            foreach ($files as $file => & $metadata) {
+                if (! self::isHome($metadata['slug'])) { //不是home的第一个页面
+                    return $metadata['url'];
                 }
             }
         }
     }
-    
-    public function genPages()
+
+    public function genPages($target_dir = false)
     {
+        if ($target_dir === false) {
+            $target_dir = $this->public_dir;
+        }
+        $urlext = $this->getOption('urlext_html');
         DOCX_Directory::removeAll($this->public_dir, array('.', 'index.php'));
-        $docs = $this->getDocuments();
-        foreach ($docs->files as $dir => & $files) {
-            foreach ($files as $file => & $metas) {
-                $tpl_file = self::isHome($metas['slug']) ? 'index.php' : 'post.php';
-                if ($content = $this->renderPage($metas, $tpl_file)) {
-                    $this->staticize($metas['html'], $content);
-                }
+        $docsdir = $this->getDocsDir();
+        foreach ($docsdir->files as $dir => & $files) {
+            foreach ($files as $file => & $metadata) {
+                $html_file = $target_dir . $metadata['url'] . $urlext;
+                $view = new DOCX_View($this, $metadata, '', false);
+                $view->staticize($html_file);
             }
         }
     }
-    
-    public function genPDF($staticize = false)
+
+    public function genPDF()
     {
         require_once APP_ROOT . '/library/WkHtmlToPdf.php';
-        $assets_dir = $this->public_dir . '/' . $this->options['assets_dir'];
+        $assets_dir = APP_ROOT . '/' . trim($this->getOption('assets_dir'), '/');
         $pdf = new WkHtmlToPdf(array(
-            'binPath' => $this->options['wkhtmltopdf'],
+            'binPath' => $this->getOption('wkhtmltopdf'),
             'encoding' => 'UTF-8',
             'user-style-sheet' => $assets_dir . '/css/style.min.css',
             'run-script' => array(
@@ -336,15 +307,17 @@ class DOCX_App
                 $assets_dir . '/js/pdfscript.js',
             ),
         ));
-        $docs = $this->getDocuments();
+        $docs = $this->getDocsDir();
         foreach ($docs->files as $dir => & $files) {
-            foreach ($files as $file => & $metas) {
-                if (self::isHome($metas['slug'])) {
-                    //$content = $this->renderPage($metas, 'index.php', true);
-                    //$pdf->addCover($content);
+            foreach ($files as $file => & $metadata) {
+                if (self::isHome($metadata['slug'])) {
+                    /*$view = new DOCX_View($this, $metadata, 'pdf.php', false);
+                    if ($content = $view->getContent()) {
+                        $pdf->addCover($content);
+                    }*/
                 } else {
-                    $content = $this->renderPage($metas, 'pdf.php', true);
-                    if ($content = $this->replaceURL($content)) {
+                    $view = new DOCX_View($this, $metadata, 'pdf.php', false);
+                    if ($content = $view->getStaticContent()) {
                         $pdf->addPage($content);
                     }
                 }

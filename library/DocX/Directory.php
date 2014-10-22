@@ -10,17 +10,27 @@ defined('CACHE_UNLINK_EMPTY_FREQ') or define('CACHE_UNLINK_EMPTY_FREQ', 0.2); //
 
 class DOCX_Directory
 {
+    const ATTR_FILE_MTIME = 'mtime';
+    const ATTR_FILE_MD5 = 'md5';
+    const ATTR_FILE_SHA = 'sha';
+    const ATTR_FILE_SIZE = 'size';
     public $dir = '';
     public $extname = false;
     public $files = array();
+    public $order_prefixes = array();
+    public $order_attr = '';
+    public $order_desc = false;
+    protected $attr_cmp = '';
+    protected $changed = false;
     
-    public function __construct($path = '.', $extname = false)
+    public function __construct($path = '.', $extname = false, $attr_cmp = self::ATTR_FILE_MTIME)
     {
         $path = realpath($path);
         if (is_dir($path)) {
             $this->dir = $path;
             $this->extname = $extname;
         }
+        $this->attr_cmp = $attr_cmp;
     }
     
     /**
@@ -91,83 +101,157 @@ class DOCX_Directory
         return $name;
     }
     
+    public static function getAttrFunc($attr_cmp)
+    {
+        switch ($attr_cmp) {
+            case self::ATTR_FILE_MD5:
+                return 'md5_file';
+            case self::ATTR_FILE_SHA:
+                return 'sha1_file';
+            case self::ATTR_FILE_SIZE:
+                return 'filesize';
+            case self::ATTR_FILE_MTIME:
+            default:
+                return 'filemtime';
+        }
+    }
+    
+    /**
+     * 文件排序
+     */
+    public static function sortFiles(array& $files, $attr_cmp, $order_desc = false)
+    {
+        if (in_array($attr_cmp, array(self::ATTR_FILE_SIZE, self::ATTR_FILE_MTIME))) {
+            $func_body = 'return $a["' . $attr_cmp . '"] - $b["' . $attr_cmp . '"];';
+        } else {
+            $func_body = 'return strcasecmp($a["' . $attr_cmp . '"], $b["' . $attr_cmp . '"]);';
+        }
+        $params = $order_desc ? '$b, $a' : '$a, $b';
+        uasort($files, create_function($params, $func_body));
+    }
+    
+    public function sortSubDir($subdir)
+    {
+        if (empty($this->order_prefixes) || empty($this->order_attr)) {
+            return;
+        }
+        $subname = ltrim($subdir, '.');
+        foreach ($this->order_prefixes as $prefix) {
+            if (starts_with($subname, $prefix)) {
+                self::sortFiles($this->files[$subdir], $this->order_attr, $this->order_desc);
+            }
+        }
+    }
+    
+    public function setSorting(array $order_prefixes, $order_attr, $order_desc = false)
+    {
+        if ($order_prefixes && $order_attr === $this->attr_cmp) {
+            $this->order_prefixes = $order_prefixes;
+            $this->order_attr = $order_attr;
+            $this->order_desc = $order_desc;
+        }
+        return $this;
+    }
+    
     public function addCache($cache_file)
     {
         $cache = new DOCX_Cache($cache_file);
-        $cache->connect($this->files)->load();
+        $cache->connect($this->files)->load($this->changed);
+        return $this;
+    }
+    
+    /**
+     * 递归地扫描文件、子目录
+     */
+    public function scan(array& $files, $path, $prefix = '.')
+    {
+        $filenames = scandir($path);
+        if (version_compare(PHP_VERSION, '5.4.0') < 0) {
+            sort($filenames); //按文件名/目录名排序
+        }
+        foreach ($filenames as $basename) {
+            if (substr($basename, 0, 1) === '.') {
+                continue; //忽略目录如 . .. .git
+            }
+            $child = $path . DIRECTORY_SEPARATOR . $basename;
+            $extname = '.' . pathinfo($basename, PATHINFO_EXTENSION);
+            $urlname = self::eraseOrd($basename, '_', $this->extname ? $this->extname : $extname);
+            if (is_dir($child)) {
+                $pathname = $prefix . '/' . $urlname;
+                $files[$pathname] = array();
+                $this->scan($files, $child, $pathname);
+            } else if ($this->extname === false || $this->extname === $extname) {
+                $attr_func = self::getAttrFunc($this->attr_cmp);
+                $files[$prefix][$urlname] = array(
+                    'fname' => $child, $this->attr_cmp => $attr_func($child),
+                );
+            }
+        }
         return $this;
     }
     
     public function getFiles()
     {
         if (empty($this->files)) {
-            $this->scan($this->dir);
+            $this->scan($this->files, $this->dir);
+            if ($this->order_prefixes && $this->order_attr) {
+                foreach ($this->files as $subdir) {
+                    $this->sortSubDir($subdir);
+                }
+            }
         }
         return $this->files;
     }
     
     /**
-     * 递归地扫描文件、子目录
-     */
-    public function scan($path, $prefix = '.')
-    {
-        if ($dh = opendir($path)) {
-            while (($basename = readdir($dh)) !== false) {
-                if (substr($basename, 0, 1) === '.') {
-                    continue; //忽略目录如 . .. .git
-                }
-                $child = $path . DIRECTORY_SEPARATOR . $basename;
-                $extname = '.' . pathinfo($basename, PATHINFO_EXTENSION);
-                $urlname = self::eraseOrd($basename, '_', $this->extname ? $this->extname : $extname);
-                if (is_dir($child)) {
-                    $pathname = $prefix . '/' . $urlname;
-                    $this->files[$pathname] = array();
-                    $this->scan($child, $pathname);
-                } else if ($this->extname === false || $this->extname === $extname) {
-                    $this->files[$prefix][$urlname] = array(
-                        'mtime' => filemtime($child), 'fname' => $child,
-                    );
-                }
-            }
-            closedir($dh);
-            ksort($this->files);
-        }
-        return $this;
-    }
-    
-    /**
      * 比较和当前目录的区别
      */
-    public function diff()
+    public function getDiffs()
     {
-        $all_files = $this->getFiles();
-        $this->files = array();
-        $this->scan($this->dir);
+        $curr_files = array();
+        $this->scan($curr_files, $this->dir);
         $result = array(
             'deldirs' => array(), 'delfiles' => array(), 
             'addfiles' => array(), 'modfiles' => array()
         );
-        $result['deldirs'] = array_diff_key($all_files, $this->files);
-        foreach ($this->files as $dir => $files) {
-            $old_files = isset($all_files[$dir]) ? $all_files[$dir] : array();
-            if ($delfiles = array_diff_key($old_files, $files)) {
+        $result['deldirs'] = array_diff(array_keys($this->files), array_keys($curr_files));
+        if (! empty($result['deldirs'])) {
+            foreach ($result['deldirs'] as $dir) {
+                unset($this->files[$dir]);
+            }
+            $this->changed = true;
+        }
+        foreach ($curr_files as $dir => & $files) {
+            $old_files = isset($this->files[$dir]) ? $this->files[$dir] : array();
+            if ($delfiles = array_diff(array_keys($old_files), array_keys($files))) {
                 $result['delfiles'][$dir] = $delfiles;
+                if (! empty($delfiles)) {
+                    foreach ($delfiles as $file) {
+                        unset($this->files[$dir][$file]);
+                    }
+                    $this->changed = true;
+                }
             }
             $addfiles = array();
             $modfiles = array();
-            foreach ($files as $file => $metas) {
+            foreach ($files as $file => & $metas) {
                 if (! isset($old_files[$file])) {
-                    $addfiles[$file] = $metas;
-                } else if ($metas['mtime'] > $old_files[$file]['mtime']) {
-                    $modfiles[$file] = $metas;
+                    $addfiles[] = $file;
+                    $this->files[$dir][$file] = & $metas;
+                } else if ($metas[$this->attr_cmp] !== $old_files[$file][$this->attr_cmp]) {
+                    $modfiles[] = $file;
+                    $this->files[$dir][$file] = & $metas;
                 }
             }
             if (! empty($addfiles)) {
-                $result['addfiles'][$dir] = & $addfiles;
+                $result['addfiles'][$dir] = $addfiles;
+                $this->changed = true;
             }
             if (! empty($modfiles)) {
-                $result['modfiles'][$dir] = & $modfiles;
+                $result['modfiles'][$dir] = $modfiles;
+                $this->changed = true;
             }
+            $this->sortSubDir($dir);
         }
         return $result;
     }

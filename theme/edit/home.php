@@ -14,20 +14,20 @@
             <div id="sub-nav-collapse" class="sub-nav-collapse"> 
                 <!-- Navigation -->
                 <ul class="nav nav-list">
-                    <?php $this->includeTpl('navi.php', array(
+                    <?php $this->includeTpl('inc/navi.php', array(
                         'urlpre' => $urlpre, 'urlext' => $urlext, 'curr_url' => $curr_url
                     )); ?>
                 </ul>
                 <?php if ($options['links']): ?>
                 <div class="well well-sidebar"> 
                     <!-- Links -->
-                    <?php foreach($options['links'] as $name => $url): ?>
-                    <a href="<?php echo $url;?>" target="_blank"><?php echo $name;?></a><br>
+                    <?php foreach($options['links'] as $link_name => $link_url): ?>
+                    <a href="<?php echo $link_url; ?>" target="_blank"><?php echo $link_name;?></a><br>
                     <?php endforeach; ?>
-                    <a href="?action=cleancache">重新缓存</a><br>
-                    <a href="?action=staticize">生成静态页</a><br>
+                    <a href="<?php echo $url_join; ?>action=cleancache">重新缓存</a><br>
+                    <a href="<?php echo $url_join; ?>action=staticize">生成静态页</a><br>
                     <?php if ($options['wkhtmltopdf']): ?>
-                    <a href="?action=genpdf">生成PDF</a><br>
+                    <a href="<?php echo $url_join; ?>action=genpdf">生成PDF</a><br>
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
@@ -36,7 +36,7 @@
         
         <div class="right-column content-area col-sm-9">
             <div class="content-page">
-            <?php $this->includeTpl('cover.php', array(
+            <?php $this->includeTpl('inc/cover.php', array(
                 'urlpre' => $urlpre, 'urlext' => $urlext, 'assets_url' => $assets_url, 
                 'first_page_url' => $first_page_url, 'page' => $page
             )); ?>

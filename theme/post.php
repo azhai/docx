@@ -14,7 +14,7 @@
             <div id="sub-nav-collapse" class="sub-nav-collapse"> 
                 <!-- Navigation -->
                 <ul class="nav nav-list">
-                    <?php $this->includeTpl('navi.php', array(
+                    <?php $this->includeTpl('inc/navi.php', array(
                         'urlpre' => $urlpre, 'urlext' => $urlext, 'curr_url' => $curr_url
                     )); ?>
                 </ul>

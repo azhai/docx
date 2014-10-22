@@ -58,6 +58,19 @@ function convert($word, $encoding = 'UTF-8')
 }
 
 /**
+ * 页面跳转，GET方式
+ * @param string $to_url 要跳转网址
+ * @param bool $permanent 是否永久跳转(HTTP 301)
+ * @return 进入新页面
+ */
+function http_redirect($to_url = '', $permanent = false)
+{
+    $status_code = $permanent ? 301 : 302;
+    @header('Location: ' . $to_url, true, $status_code);
+    return die(); //阻止运行后面的代码
+}
+
+/**
  * 找出两个路径或URL开头相同的部分
  */
 function compare_pathes($curr, $last)

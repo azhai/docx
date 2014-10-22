@@ -39,12 +39,16 @@ class DOCX_Templater
      * @param array $context 变量数组
      * @return string 当前内容
      */
-    public static function replaceWith($content, array $context = array())
+    public static function replaceWith($content, array $context = array(), $prefix = '', $subfix = '')
     {
         if (! empty($context)) {
-            $keys = array_map(create_function('$x', 'return "\${$x}";'), array_keys($context));
-            $holders = array_map(create_function('$x', 'return "%$x\$s";'), range(1, count($context)));
-            $content = vsprintf(str_replace($keys, $holders, $content), $context);
+            $keys = array();
+            $values = array();
+            foreach ($context as $key => & $value) {
+                $keys[] = $prefix . $key . $subfix;
+                $values[] = $value;
+            }
+            $content = str_replace($keys, $values, $content);
         }
         return $content;
     }

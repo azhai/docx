@@ -9,7 +9,7 @@
 <title><?php echo $page['title'] . ' - ' . $options['title']; ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="description" content="<?php echo $options['tagline'];?>" />
-<meta name="author" content="<?php echo $options['title']; ?>">
+<meta name="author" content="<?php echo $options['author']; ?>">
 <link rel="icon" href="<?php echo $assets_url; ?>/img/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="<?php echo $assets_url; ?>/css/style.min.css">
 <style rel="stylesheet">h1 a.html-hidden, div a.html-hidden<?php echo $html_hide; ?></style>
