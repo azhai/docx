@@ -15,8 +15,9 @@ $settings = array(
     'repo' => 'azhai/docx',
     'links' => array(
         'Coding仓库' => 'https://coding.net/u/azhai/p/docx/git',
-        "Todaymade出品" => 'http://todaymade.com',
-        "Xin Meng汉化" => 'http://blog.emx2.co.uk'
+        'OSChina仓库' => 'http://git.oschina.net/azhai/docx',
+        "Todaymade出品Daux.io" => 'http://todaymade.com',
+        "Xin Meng翻译文档" => 'http://blog.emx2.co.uk'
     ),
     'greetings' => array (
         '在合适的时候使用PHP – Rasmus Lerdorf',
