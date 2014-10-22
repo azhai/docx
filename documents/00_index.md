@@ -1,5 +1,6 @@
-title: 首页
-slug: home
+layout: home    
+title:  首页
+slug:   home
 tags:
 
 <p class="lead">
