@@ -5,6 +5,25 @@
  * @author Ryan Liu <azhai@126.com>
  */
 
+defined('APP_ROOT') or die('Illeigal access');     //禁止非法访问
+
+/**
+ * 自动加载库文件
+ *
+ * @param string $class
+ *            要使用的类名
+ * @return bool
+ */
+function autoload_class($class)
+{
+    if (substr($class, 0, 5) === 'DOCX_') {
+        $path = 'DocX/' . substr($class, 5) . '.php';
+    } else {
+        $path = $class . '.php';
+    }
+    require_once APP_ROOT . '/library/' . $path;
+    return class_exists($class, false);
+}
 
 /**
  * 开始的字符串相同

@@ -16,8 +16,8 @@ $settings = array(
     'links' => array(
         'Coding仓库' => 'https://coding.net/u/azhai/p/docx/git',
         'OSChina仓库' => 'http://git.oschina.net/azhai/docx',
-        "Todaymade出品Daux.io" => 'http://todaymade.com',
-        "Xin Meng翻译文档" => 'http://blog.emx2.co.uk'
+        'Todaymade出品Daux.io' => 'http://todaymade.com',
+        'Xin Meng翻译文档' => 'http://blog.emx2.co.uk'
     ),
     'greetings' => array (
         '在合适的时候使用PHP – Rasmus Lerdorf',
@@ -33,22 +33,21 @@ $settings = array(
     ),
 );
 
-$litelib = APP_ROOT . '/library/docx_lite.php';
-if (! is_readable($litelib)) {
-    $wildcard = APP_ROOT . '/library/DocX/*.php';
-    foreach (glob($wildcard) as $filename) {
-        require_once $filename;
-    }
-    if (MINIFY_LIBRARY) {
-        require_once APP_ROOT . '/library/Compressor.php';
-        $compressor = new Compressor();
-        $compressor->compress($litelib, $wildcard);
-    }
-} else {
-    require_once $litelib; // 使用压缩后的文件
-}
-require_once APP_ROOT . '/library/Parsedown.php';
 
+if (MINIFY_LIBRARY) {
+    $package = APP_ROOT . '/library/docx.lite.php';
+    if (! is_readable($package)) {
+        require_once APP_ROOT . '/library/Compressor.php';
+        $wildcard = APP_ROOT . '/library/DocX/*.php';
+        $compressor = new Compressor();
+        $compressor->compress($package, $wildcard);
+    }
+    require_once $package; // 使用压缩后的文件
+} else {
+    require_once APP_ROOT . '/library/DocX/utils.php';
+}
+
+spl_autoload_register('autoload_class');
 $app = new DOCX_App($settings);
 $app->run();
 ?>

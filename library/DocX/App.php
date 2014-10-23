@@ -21,9 +21,13 @@ class DOCX_App
     public $document_dir = '';
     public $public_dir = '';
     public $cache_dir = '';
+    public $theme_dir = '';
+    public $assets_dir = '';
+    
     protected $abs_prefix = false;
     protected $url_type = self::URL_TYPE_AUTO;
     protected $offset = 0;
+    protected $index = 'index.php';
     protected $route = 'r';
     protected $docs_dir = null;
     protected $toppest_url = '';
@@ -61,10 +65,23 @@ class DOCX_App
         if (is_array($options)) {
             $this->options = array_merge($this->options, $options);
         }
-        $this->document_dir = APP_ROOT  . '/' . trim($this->getOption('document_dir'), ' /');
-        $this->public_dir = APP_ROOT  . '/' . trim($this->getOption('public_dir'), ' /');
-        $this->cache_dir = APP_ROOT  . '/' . trim($this->getOption('cache_dir'), ' /');
+        $this->document_dir = self::getRealPath($this->getOption('document_dir'));
+        $this->public_dir = self::getRealPath($this->getOption('public_dir'));
+        $this->cache_dir = self::getRealPath($this->getOption('cache_dir'));
+        $this->theme_dir = self::getRealPath($this->getOption('theme_dir'));
+        $this->assets_dir = self::getRealPath($this->getOption('assets_dir'));
         $this->abs_prefix = $this->getAbsPrefix();
+    }
+
+    public static function getRealPath($dir)
+    {
+        $path = APP_ROOT . DIRECTORY_SEPARATOR . trim($dir, '/');
+        $realpath = realpath($path);
+        if ($realpath === false) {
+            @mkdir($path, 0755, true);
+            $realpath = realpath($path);
+        }
+        return $realpath;
     }
 
     public static function isHome($slug)
@@ -112,20 +129,21 @@ class DOCX_App
     
     public function fixURLType()
     {
-        $position = strpos($this->abs_prefix, 'index.php');
-        if ($position === false) {
-            $this->url_type = self::URL_TYPE_REWRITE;
-            $this->abs_prefix = rtrim($this->abs_prefix, '/');
-        } else {
-            $pattern = '/^\?([^=?&]+)=/';
-            $query = substr($this->abs_prefix, $position + strlen('index.php'));
+        $pattern = '!([a-zA-Z0-9_-]+\.php)!';
+        if (preg_match($pattern, $this->abs_prefix, $matches, PREG_OFFSET_CAPTURE)) {
+            list($this->index, $position) = $matches[0];
+            $pattern = '!^\?([a-zA-Z0-9_-]+)=!';
+            $query = substr($this->abs_prefix, $position + strlen($this->index));
             if (preg_match($pattern, $query, $matches)) {
                 $this->url_type = self::URL_TYPE_QUERY;
-                $this->route = $matches[0];
+                $this->route = $matches[1];
             } else {
                 $this->url_type = self::URL_TYPE_TAIL;
             }
             $this->abs_prefix = rtrim($this->abs_prefix, '?&');
+        } else {
+            $this->url_type = self::URL_TYPE_REWRITE;
+            $this->abs_prefix = rtrim($this->abs_prefix, '/');
         }
         return $this->url_type;
     }
@@ -141,7 +159,7 @@ class DOCX_App
             $this->offset = - 99;
         } else {
             if ($this->url_type === self::URL_TYPE_REWRITE) {
-                $raw_url = str_replace('/index.php', '/', $raw_url);
+                $raw_url = str_replace('/' . $this->index, '/', $raw_url);
                 $this->offset = - 1;
             }
             $prelen = strlen($this->getAbsPrefix());
@@ -282,7 +300,7 @@ class DOCX_App
             $target_dir = $this->public_dir;
         }
         $urlext = $this->getOption('urlext_html');
-        DOCX_Directory::removeAll($this->public_dir, array('.', 'index.php'));
+        DOCX_Directory::removeAll($this->public_dir, array('.', $this->index));
         $docsdir = $this->getDocsDir();
         foreach ($docsdir->files as $dir => & $files) {
             foreach ($files as $file => & $metadata) {
@@ -295,16 +313,14 @@ class DOCX_App
 
     public function genPDF()
     {
-        require_once APP_ROOT . '/library/WkHtmlToPdf.php';
-        $assets_dir = APP_ROOT . '/' . trim($this->getOption('assets_dir'), '/');
         $pdf = new WkHtmlToPdf(array(
             'binPath' => $this->getOption('wkhtmltopdf'),
             'encoding' => 'UTF-8',
-            'user-style-sheet' => $assets_dir . '/css/style.min.css',
+            'user-style-sheet' => $this->assets_dir . '/css/style.min.css',
             'run-script' => array(
-                $assets_dir . '/js/jquery.min.js',
-                $assets_dir . '/js/highlight.min.js',
-                $assets_dir . '/js/pdfscript.js',
+                $this->assets_dir . '/js/jquery.min.js',
+                $this->assets_dir . '/js/highlight.min.js',
+                $this->assets_dir . '/js/pdfscript.js',
             ),
         ));
         $docs = $this->getDocsDir();

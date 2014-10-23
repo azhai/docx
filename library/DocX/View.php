@@ -15,7 +15,6 @@ class DOCX_View
     const URL_EXT = '{{DOCX_URL_EXT}}';
     const URL_ASSETS = '{{DOCX_URL_ASSETS}}';
     const HTML_HIDE = '{{DOCX_HTML_HIDDEN}}';
-
     
     protected $app = null;
     protected $metadata = array();
@@ -47,8 +46,7 @@ class DOCX_View
             }
             $tpl_file = ($edit_mode ? 'edit/' : '') . $tpl_file . '.php';
         }
-        $theme_dir = APP_ROOT . '/' . trim($this->app->getOption('theme_dir'), ' /');
-        return is_readable($theme_dir . '/' . $tpl_file) ? $tpl_file : 'base.php';
+        return is_readable($this->app->theme_dir . '/' . $tpl_file) ? $tpl_file : 'base.php';
     }
 
     public function isEditMode()
@@ -56,17 +54,16 @@ class DOCX_View
         return starts_with($this->tpl_file, 'edit/');
     }
     
-    public function ensureAssets($target_dir = false)
+    public function ensureAssets($public_dir = false)
     {
-        if ($target_dir === false) {
-            $target_dir = $this->app->public_dir;
+        if ($public_dir === false) {
+            $public_dir = $this->app->public_dir;
         }
-        $assets_dir = $this->app->getOption('assets_dir');
-        if (! file_exists($target_dir . '/' . $assets_dir)) { //复制资源文件
+        $target_dir = $public_dir . '/assets';
+        if (! file_exists($target_dir)) { //复制资源文件
             $cmd = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'xcopy' : 'cp -r';
-            $resource_dir = APP_ROOT . '/' . $assets_dir;
-            if (realpath($target_dir . '/assets') !== $resource_dir) {
-                @shell_exec($cmd . ' ' . $resource_dir . ' ' . $target_dir . '/assets');
+            if (realpath($target_dir) !== $this->app->assets_dir) {
+                @shell_exec($cmd . ' ' . $this->app->assets_dir . ' ' . $target_dir);
             }
         }
     }
@@ -75,8 +72,7 @@ class DOCX_View
     {
         if (is_null($this->templater)) {
             $docs = $this->app->getDocsDir();
-            $theme_dir = APP_ROOT . '/' . trim($this->app->getOption('theme_dir'), ' /');
-            $this->templater = new DOCX_Templater($theme_dir, $this->app->cache_dir);
+            $this->templater = new DOCX_Templater($this->app->theme_dir, $this->app->cache_dir);
             $this->templater->globals = array(
                 'home_url' => $this->app->getConstant('HOME_PAGE_URL'),
                 'admin_urlpre' => $this->app->getConstant('ADMIN_URLPRE'),
@@ -142,10 +138,10 @@ class DOCX_View
 
     public function staticize($html_file = false)
     {
-        $target_dir = $this->app->public_dir;
-        $this->ensureAssets($target_dir);
+        $public_dir = $this->app->public_dir;
+        $this->ensureAssets($public_dir);
         if ($html_file === false) {
-            $html_file = $target_dir . $this->metadata['url'] . $urlext;
+            $html_file = $public_dir . $this->metadata['url'] . $urlext;
         }
         @mkdir(dirname($html_file), 0755, true);
         $content = $this->getStaticContent();
