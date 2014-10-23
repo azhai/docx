@@ -81,6 +81,7 @@ class DOCX_View
                 'options' => $this->app->getOption(false),
                 'docs' => & $docs->files,
             );
+            $this->ensureAssets($this->app->public_dir); //复制资源文件
         }
         return $this->templater;
     }
@@ -117,7 +118,7 @@ class DOCX_View
         $rel_prefix = $this->app->getRelPrefix();
         $assets_dir = $this->app->getOption('assets_dir');
         $this->replacers[self::URL_PRE] = $this->app->getAbsPrefix();
-        $this->replacers[self::URL_ASSETS] = $rel_prefix . '/' . $assets_dir;
+        $this->replacers[self::URL_ASSETS] = $rel_prefix . '/assets';
         $content = DOCX_Templater::replaceWith($this->content, $this->replacers);
         @header('Content-Type: text/html; charset=utf8');
         return die($content);
@@ -139,7 +140,6 @@ class DOCX_View
     public function staticize($html_file = false)
     {
         $public_dir = $this->app->public_dir;
-        $this->ensureAssets($public_dir);
         if ($html_file === false) {
             $html_file = $public_dir . $this->metadata['url'] . $urlext;
         }

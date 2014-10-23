@@ -21,10 +21,10 @@
     <div class="container">
         <div class="row">
             <div class="text-center col-sm-12">
-                <a href="<?php echo $urlpre . $admin_urlpre . $urlext;?>" class="btn btn-secondary btn-hero html-hidden"> 管理静态页 </a>
                 <?php if ($options['repo']): ?>
                 <a href="https://github.com/<?php echo $options['repo']; ?>" class="btn btn-secondary btn-hero"> 前往GitHub </a>
                 <?php endif; ?>
+                <a href="<?php echo $urlpre . $admin_urlpre . $urlext;?>" class="btn btn-secondary btn-hero html-hidden"> 管理静态页 </a>
                 <a href="<?php echo $urlpre . $first_page_url . $urlext;?>" class="btn btn-primary btn-hero"> <?php echo $options['reading']; ?> </a>
             </div>
         </div>

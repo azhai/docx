@@ -75,7 +75,7 @@ class DOCX_App
 
     public static function getRealPath($dir)
     {
-        $path = APP_ROOT . DIRECTORY_SEPARATOR . trim($dir, '/');
+        $path = DOCX_ROOT . DIRECTORY_SEPARATOR . trim($dir, '/');
         $realpath = realpath($path);
         if ($realpath === false) {
             @mkdir($path, 0755, true);
@@ -263,7 +263,7 @@ class DOCX_App
             DOCX_Directory::removeAll($this->cache_dir, array('.'));
         } else if ($action === 'staticize') {
             $this->genPages();
-            return http_redirect($this->getStaticIndex());
+            return $this->gotoStaticIfCould();
         } else if ($action === 'genpdf') {
             $pdf = $this->genPDF();
             return $pdf->send($this->getOption('title') . '.pdf', true);
@@ -271,12 +271,14 @@ class DOCX_App
         $this->dispatch()->output();
     }
     
-    public function getStaticIndex()
+    public function gotoStaticIfCould()
     {
-        $rel_prefix = $this->getRelPrefix();
-        $public_dir = trim($this->getOption('public_dir'), ' /');
-        $urlext = $this->getOption('urlext_html');
-        return $rel_prefix . '/' . $public_dir . '/index' . $urlext;
+        $dir = dirname($this->getAbsPrefix());
+        if (starts_with($this->public_dir, APP_ROOT)) {
+            $dir .= substr($this->public_dir, strlen(APP_ROOT));
+            $urlext = $this->getOption('urlext_html');
+            return http_redirect($dir . '/index' . $urlext);
+        }
     }
 
     public function getToppestPage()
@@ -300,7 +302,12 @@ class DOCX_App
             $target_dir = $this->public_dir;
         }
         $urlext = $this->getOption('urlext_html');
-        DOCX_Directory::removeAll($this->public_dir, array('.', $this->index));
+        $excludes = array('.', $this->index);
+        if (starts_with($this->document_dir, $this->public_dir)) {
+            //避免误删原始文档
+            $excludes[] = trim(substr($this->document_dir, strlen($this->public_dir)), '/');
+        }
+        DOCX_Directory::removeAll($this->public_dir, $excludes);
         $docsdir = $this->getDocsDir();
         foreach ($docsdir->files as $dir => & $files) {
             foreach ($files as $file => & $metadata) {

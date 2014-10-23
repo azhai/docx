@@ -21,7 +21,7 @@ function autoload_class($class)
     } else {
         $path = $class . '.php';
     }
-    require_once APP_ROOT . '/library/' . $path;
+    require_once DOCX_ROOT . '/library/' . $path;
     return class_exists($class, false);
 }
 
