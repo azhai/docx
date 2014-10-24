@@ -4,19 +4,20 @@ defined('DOCX_ROOT') or define('DOCX_ROOT', dirname(APP_ROOT));
 defined('MINIFY_LIBRARY') or define('MINIFY_LIBRARY', true);
 
 $settings = array(
+    'url_prefix' => '/blog/index.php?r=',
     'title' => 'docx文档生成工具',
     'tagline' => '最简单的方式构建你的项目文档',
     'reading' => '开始阅读文档',
     'cover_image' => 'img/cover.png',
     'author' => 'Ryan Liu',
     'layout' => 'post',                     #默认模板布局
-    'document_dir' => 'blog/_docs',         #原始文档目录
-    'public_dir' => 'blog',                 #静态输出目录
+    'document_dir' => APP_ROOT . '/_docs',  #原始文档目录
+    'public_dir' => APP_ROOT,               #静态输出目录
     'theme_dir' => 'theme',                 #主题模板目录
     'assets_dir' => 'theme/assets',         #资源目录
     'cache_dir' => 'cache/blog',            #缓存目录
     'cache_ext' => '.json',
-    'blog_sorting' => array(),
+    'blog_sorting' => array('/PHP'),
     #需要安装wkhtmltopdf、fontconfig、一款中文字体如文泉驿
     #'wkhtmltopdf' => 'wkhtmltopdf',
     'repo' => 'azhai/docx',

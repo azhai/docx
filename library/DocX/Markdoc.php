@@ -18,7 +18,7 @@ class DOCX_Markdoc
     protected static $instances = array();
     protected $metadata = array();
     protected $filename = '';
-    protected $dochtml = '';
+    protected $htmldoc = '';
     protected $markdown = '';
     protected $metatext = '';
     protected $headsize = -1;
@@ -81,7 +81,7 @@ class DOCX_Markdoc
         //将MetaData和Content分开
         if (! is_readable($this->filename)) {
             $this->metadata = array('title' => 'Oh No');
-            $this->dochtml = '<h3>抱歉，找不到页面~!</h3>';
+            $this->htmldoc = '<h3>抱歉，找不到页面~!</h3>';
             $this->headsize = 0; //读完了markdown
             return $this->metadata;
         }
@@ -154,13 +154,13 @@ class DOCX_Markdoc
             $this->markdown = substr($content, $this->headsize);
             $this->headsize = 0; //读完了markdown
         }
-        if (! $this->dochtml && $this->markdown) { //使用外部解析器解析内容
-            $this->dochtml = Parsedown::instance()->text($this->markdown);
+        if (! $this->htmldoc && $this->markdown) { //使用外部解析器解析内容
+            $this->htmldoc = Parsedown::instance()->text($this->markdown);
         }
         $textdata = array(
             'metatext' => $this->metatext,
             'markdown' => $this->markdown,
-            'dochtml' => $this->dochtml,
+            'htmldoc' => $this->htmldoc,
         );
         return array_merge($this->metadata, $textdata);
     }

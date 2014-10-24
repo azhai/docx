@@ -51,7 +51,7 @@
                         </span>
                     </div>
                     
-                    <?php echo $page['dochtml']; ?>
+                    <?php echo $page['htmldoc']; ?>
                 </article>
             </div>
         </div>

@@ -75,9 +75,8 @@ class DOCX_App
 
     public static function getRealPath($dir)
     {
-        $path = DOCX_ROOT . DIRECTORY_SEPARATOR . trim($dir, '/');
-        $realpath = realpath($path);
-        if ($realpath === false) {
+        $path = starts_with($dir, '/') ? $dir : $path = DOCX_ROOT . '/' . $dir;
+        if (($realpath = realpath($path)) === false) {
             @mkdir($path, 0755, true);
             $realpath = realpath($path);
         }
@@ -275,7 +274,9 @@ class DOCX_App
     {
         $dir = dirname($this->getAbsPrefix());
         if (starts_with($this->public_dir, APP_ROOT)) {
-            $dir .= substr($this->public_dir, strlen(APP_ROOT));
+            if ($subdir = substr($this->public_dir, strlen(APP_ROOT))) {
+                $dir .= $subdir;
+            }
             $urlext = $this->getOption('urlext_html');
             return http_redirect($dir . '/index' . $urlext);
         }

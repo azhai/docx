@@ -39,7 +39,7 @@ article pre { color: #eaeaea; }
             </span>
         </div>
         
-        <?php echo $page['dochtml']; ?>
+        <?php echo $page['htmldoc']; ?>
     </article>
     
 </div>

@@ -53,7 +53,7 @@
                     <textarea id="metatext_editor" name="metatext" style="display:none" 
                             rows="<?php echo substr_count($page['metatext'], "\n") + 1; ?>" cols="80"><?php echo $page['metatext']; ?></textarea>
                     <textarea id="markdown_editor" name="markdown"><?php echo $page['markdown']; ?></textarea>
-                    <div id="dochtml_editor" name="markdown" class="pen hinted" placeholder="im a placeholder"><?php echo $page['dochtml']; ?></div>
+                    <div id="htmldoc_editor" name="markdown" class="pen hinted" placeholder="im a placeholder"><?php echo $page['htmldoc']; ?></div>
                     </form>
                     
                     <div class="clearfix"></div>
@@ -73,7 +73,7 @@
 <script src="<?php echo $assets_url; ?>/js/demarcate.min.js"></script>
 <script type="text/javascript">
 $(function(){
-    var marked = $('#dochtml_editor');
+    var marked = $('#htmldoc_editor');
     var pen = new Pen({editor: marked[0], class: "hinted"});
     marked.addClass('hinted');
     pen.rebuild();

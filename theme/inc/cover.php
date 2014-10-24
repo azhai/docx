@@ -34,7 +34,7 @@
 <div class="homepage-content container-fluid">
     <div class="container">
         <div class="row">
-            <div class="col-sm-10 col-sm-offset-1"> <?php echo $page['dochtml'];?> </div>
+            <div class="col-sm-10 col-sm-offset-1"> <?php echo $page['htmldoc'];?> </div>
         </div>
     </div>
 </div>
