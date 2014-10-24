@@ -4,7 +4,7 @@ defined('DOCX_ROOT') or define('DOCX_ROOT', dirname(APP_ROOT));
 defined('MINIFY_LIBRARY') or define('MINIFY_LIBRARY', true);
 
 $settings = array(
-    'url_prefix' => '/blog/index.php?r=',
+    'url_prefix' => '/blog/index.php?q=',
     'title' => 'docx文档生成工具',
     'tagline' => '最简单的方式构建你的项目文档',
     'reading' => '开始阅读文档',
@@ -13,6 +13,7 @@ $settings = array(
     'layout' => 'post',                     #默认模板布局
     'document_dir' => APP_ROOT . '/_docs',  #原始文档目录
     'public_dir' => APP_ROOT,               #静态输出目录
+    #相对路径，自动加上DOCX_ROOT前缀
     'theme_dir' => 'theme',                 #主题模板目录
     'assets_dir' => 'theme/assets',         #资源目录
     'cache_dir' => 'cache/blog',            #缓存目录
