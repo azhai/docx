@@ -42,7 +42,9 @@ class DOCX_App
         'timezone' => 'Asia/Shanghai',
         'blog_sorting' => array(),          #文件按更新时间排列，用于博客
         'date_format' => 'Y年n月j日 星期w',
-        'repo' => false,                    #github仓库url
+        'publish_branch' => false,          #（可写）HTML仓库分支名称
+        'publish_repo' => false,            #（可写）HTML仓库完整url
+        'github_repo' => false,             #github仓库url
         'links' => array(),                 #友情链接
         'google_analytics' => false,
         'ignore' => array('folders' => array('.git', )),
@@ -169,6 +171,8 @@ class DOCX_App
         } else if ($action === 'genpdf') {
             $pdf = $this->genPDF();
             return $pdf->send($this->getOption('title') . '.pdf', true);
+        } else if ($action === 'publish') {
+            $this->pubPages();
         }
         $this->dispatch()->output();
     }
@@ -247,5 +251,34 @@ class DOCX_App
             }
         }
         return $pdf;
+    }
+    
+    public function pubPages($comment = 'WebPub', $target_dir = false)
+    {
+        if ($target_dir === false) {
+            $target_dir = $this->public_dir;
+        }
+        $branch = $this->getOption('publish_branch');
+        if (! is_dir($target_dir . '/.git')) {
+            $repo = Git::create($target_dir);
+            $repo->add('.');
+            $repo->commit('Init');
+            $remote = $this->getOption('publish_repo');
+            $repo->run("remote add origin $remote");
+            $repo->run("checkout -b $branch");
+            $branches = $repo->list_remote_branches();
+            if (! empty($branches)) {
+                $repo->pull('origin', $branch);
+                $this->genPages(); //重新生成页面
+            }
+        }
+        $repo = Git::open($target_dir);
+        $repo->add('.');
+        try {
+            $repo->commit($comment);
+        } catch (Exception $e) {
+            echo strval($e);
+        }
+        return $repo->push('origin', $branch);
     }
 }

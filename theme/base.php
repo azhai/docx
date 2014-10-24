@@ -20,8 +20,8 @@
 <body>
 
 <!-- Docs -->
-<?php if ($options['repo']): ?>
-<a href="https://github.com/<?php echo $options['repo']; ?>" target="_blank" id="github-ribbon" class="hidden-print">
+<?php if ($is_home && $options['github_repo']): ?>
+<a href="https://github.com/<?php echo $options['github_repo']; ?>" target="_blank" id="github-ribbon" class="hidden-print">
     <img src="<?php echo $assets_url; ?>/img/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
 </a>
 <?php endif; ?>

@@ -30,6 +30,9 @@
                     <?php if ($options['wkhtmltopdf']): ?>
                     <a href="<?php echo $linkage->buildQuery('action=genpdf'); ?>">生成PDF</a><br>
                     <?php endif; ?>
+                    <?php if ($options['publish_branch']): ?>
+                    <a href="<?php echo $linkage->buildQuery('action=publish'); ?>">发布HTML页面</a><br>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

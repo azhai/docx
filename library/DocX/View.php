@@ -102,6 +102,7 @@ class DOCX_View
         $templater->globals['urlpre'] = self::URL_PRE;
         $templater->globals['urlext'] = self::URL_EXT;
         $templater->globals['assets_url'] = self::URL_ASSETS;
+        $templater->globals['is_home'] = $this->app->isHome($this->metadata['slug']);
         $this->content = $templater->render($this->tpl_file, array(
             'linkage' => & $this->app->linkage, 'page' => $markdoc->getPageData(),
             'curr_url' => $this->metadata['url'], 'first_page_url' => $first_page_url,

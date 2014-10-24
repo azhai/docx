@@ -21,7 +21,8 @@ $settings = array(
     'blog_sorting' => array('/PHP'),
     #需要安装wkhtmltopdf、fontconfig、一款中文字体如文泉驿
     #'wkhtmltopdf' => 'wkhtmltopdf',
-    'repo' => 'azhai/docx',
+    'publish_branch' => false,              #（可写）HTML仓库分支名称
+    'publish_repo' => false,                #（可写）HTML仓库完整url
     'links' => array(
         'Coding仓库' => 'https://coding.net/u/azhai/p/docx/git',
         'OSChina仓库' => 'http://git.oschina.net/azhai/docx',
