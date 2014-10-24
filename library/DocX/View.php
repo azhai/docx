@@ -76,7 +76,6 @@ class DOCX_View
             $this->templater->globals = array(
                 'home_url' => $this->app->getConstant('HOME_PAGE_URL'),
                 'admin_urlpre' => $this->app->getConstant('ADMIN_URLPRE'),
-                'url_join' => $this->app->getURLJoin(),
                 'html_hide' => self::HTML_HIDE,
                 'options' => $this->app->getOption(false),
                 'docs' => & $docs->files,
@@ -104,7 +103,7 @@ class DOCX_View
         $templater->globals['urlext'] = self::URL_EXT;
         $templater->globals['assets_url'] = self::URL_ASSETS;
         $this->content = $templater->render($this->tpl_file, array(
-            'view' => & $this, 'page' => $markdoc->getPageData(),
+            'linkage' => & $this->app->linkage, 'page' => $markdoc->getPageData(),
             'curr_url' => $this->metadata['url'], 'first_page_url' => $first_page_url,
         ), true);
     }
@@ -115,9 +114,9 @@ class DOCX_View
         $urlext = $this->app->getOption('urlext_php');
         $this->replacers[self::URL_EXT] = $urlext;
         $this->replacers[self::HTML_HIDE] = '{}';
-        $rel_prefix = $this->app->getRelPrefix();
+        $rel_prefix = $this->app->linkage->getRelPrefix();
         $assets_dir = $this->app->getOption('assets_dir');
-        $this->replacers[self::URL_PRE] = $this->app->getAbsPrefix();
+        $this->replacers[self::URL_PRE] = $this->app->linkage->getAbsPrefix();
         $this->replacers[self::URL_ASSETS] = $rel_prefix . '/assets';
         $content = DOCX_Templater::replaceWith($this->content, $this->replacers);
         @header('Content-Type: text/html; charset=utf8');
@@ -131,7 +130,7 @@ class DOCX_View
         $this->replacers[self::URL_EXT] = $urlext;
         $this->replacers[self::HTML_HIDE] = '{display: none}';
         $curr_url = $this->metadata['url'] . $urlext;
-        $rel_prefix = $this->app->getRelPrefix(ltrim($curr_url, '/'));
+        $rel_prefix = $this->app->linkage->getRelPrefix(ltrim($curr_url, '/'));
         $this->replacers[self::URL_PRE] = $rel_prefix;
         $this->replacers[self::URL_ASSETS] = $rel_prefix . '/assets';
         return DOCX_Templater::replaceWith($this->content, $this->replacers);

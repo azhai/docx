@@ -43,10 +43,11 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-5 col-sm-offset-1">
-                <?php if (!empty($options['links'])): ?>
+                <?php if ($options['links']): ?>
+                <!-- Links -->
                 <ul class="footer-nav">
-                    <?php foreach($options['links'] as $name => $url): ?>
-                    <li><a href="<?php echo $url;?>" target="_blank"><?php echo $name;?></a></li>
+                    <?php foreach($options['links'] as $link_name => $link_url): ?>
+                    <a href="<?php echo $link_url; ?>" target="_blank"><?php echo $link_name; ?></a><br>
                     <?php endforeach; ?>
                 </ul>
                 <?php endif; ?>

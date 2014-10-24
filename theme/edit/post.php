@@ -16,14 +16,14 @@
                         'urlpre' => $urlpre, 'urlext' => $urlext, 'curr_url' => $curr_url
                     )); ?>
                 </ul>
-                <?php if ($options['links']): ?>
                 <div class="well well-sidebar">
+                    <?php if ($options['links']): ?>
                     <!-- Links -->
-                    <?php foreach($options['links'] as $name => $url): ?>
-                    <a href="<?php echo $url;?>" target="_blank"><?php echo $name;?></a><br>
+                    <?php foreach($options['links'] as $link_name => $link_url): ?>
+                    <a href="<?php echo $link_url; ?>" target="_blank"><?php echo $link_name; ?></a><br>
                     <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
             </div>
         </div>
 

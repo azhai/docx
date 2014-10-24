@@ -11,29 +11,20 @@
  */
 class DOCX_App
 {
-    const URL_TYPE_QUERY = 0;       //参数
-    const URL_TYPE_TAIL = 1;        //地址
-    const URL_TYPE_REWRITE = 2;     //重写
-    const URL_TYPE_AUTO = 9;        //根据url_prefix判断
     const HOME_PAGE_URL = '/index';
     const ADMIN_URLPRE = '/admin';
-
+    public $linkage = null;
     public $document_dir = '';
     public $public_dir = '';
     public $cache_dir = '';
     public $theme_dir = '';
     public $assets_dir = '';
-    
-    protected $abs_prefix = false;
-    protected $url_type = self::URL_TYPE_AUTO;
-    protected $offset = 0;
-    protected $index = 'index.php';
-    protected $route = 'r';
     protected $docs_dir = null;
     protected $toppest_url = '';
+    
     protected $options = array(
         'url_prefix' => '/index.php',       #首页网址
-        'url_type' => self::URL_TYPE_AUTO,  #网址类型
+        'url_type' => 9,                    #网址类型
         'title' => "我的文档",              #站名
         'tagline' => false,                 #封面宣言
         'reading' => "开始阅读文档",        #封面阅读按钮上的文字
@@ -70,7 +61,12 @@ class DOCX_App
         $this->cache_dir = self::getRealPath($this->getOption('cache_dir'));
         $this->theme_dir = self::getRealPath($this->getOption('theme_dir'));
         $this->assets_dir = self::getRealPath($this->getOption('assets_dir'));
-        $this->abs_prefix = $this->getAbsPrefix();
+        $this->linkage = new DOCX_Linkage($this->getOption('url_prefix'), $this->getOption('url_type'));
+    }
+    
+    public static function getConstant($name)
+    {
+        return constant(__CLASS__ . '::' . $name);
     }
 
     public static function getRealPath($dir)
@@ -87,17 +83,6 @@ class DOCX_App
     {
         return $slug === 'home';
     }
-
-    public static function getRawURL()
-    {
-        $raw_url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        return is_null($raw_url) ? '/' : urldecode($raw_url); //汉字逆向转码
-    }
-    
-    public function getConstant($name)
-    {
-        return constant(__CLASS__ . '::' . $name);
-    }
     
     public function getOption($key = false)
     {
@@ -108,88 +93,6 @@ class DOCX_App
         } else if (isset($this->options[$key])) {
             return $this->options[$key];
         }
-    }
-
-    public function getAbsPrefix()
-    {
-        if ($this->abs_prefix !== false) {
-            return $this->abs_prefix;
-        }
-        $this->url_type = intval($this->getOption('url_type'));
-        $this->abs_prefix = rtrim($this->getOption('url_prefix'), '/');
-        $url_types = array(
-            self::URL_TYPE_QUERY, self::URL_TYPE_TAIL, self::URL_TYPE_REWRITE
-        );
-        if (! in_array($this->url_type, $url_types)) { //根据网址前缀判断类型
-            $this->url_type = $this->fixURLType();
-        }
-        return $this->abs_prefix;
-    }
-    
-    public function fixURLType()
-    {
-        $pattern = '!([a-zA-Z0-9_-]+\.php)!';
-        if (preg_match($pattern, $this->abs_prefix, $matches, PREG_OFFSET_CAPTURE)) {
-            list($this->index, $position) = $matches[0];
-            $pattern = '!^\?([a-zA-Z0-9_-]+)=!';
-            $query = substr($this->abs_prefix, $position + strlen($this->index));
-            if (preg_match($pattern, $query, $matches)) {
-                $this->url_type = self::URL_TYPE_QUERY;
-                $this->route = $matches[1];
-            } else {
-                $this->url_type = self::URL_TYPE_TAIL;
-            }
-            $this->abs_prefix = rtrim($this->abs_prefix, '?&');
-        } else {
-            $this->url_type = self::URL_TYPE_REWRITE;
-            $this->abs_prefix = rtrim($this->abs_prefix, '/');
-        }
-        return $this->url_type;
-    }
-
-    public function getCurrURL($rstrip = false)
-    {
-        $raw_url = self::getRawURL();
-        if ($this->url_type === self::URL_TYPE_QUERY) {
-            $curr_url = '';
-            if (isset($_GET[$this->route])) {
-                $curr_url = '/' . trim($_GET[$this->route], '/') . '/';
-            }
-            $this->offset = - 99;
-        } else {
-            if ($this->url_type === self::URL_TYPE_REWRITE) {
-                $raw_url = str_replace('/' . $this->index, '/', $raw_url);
-                $this->offset = - 1;
-            }
-            $prelen = strlen($this->getAbsPrefix());
-            //substr()陷阱，当string的长度等于start，将返回FALSE而不是''
-            $curr_url = (strlen($raw_url) > $prelen) ? substr($raw_url, $prelen) : '';
-        }
-        return $rstrip ? rtrim($curr_url, '/') : $curr_url;
-    }
-    
-    public function getURLJoin()
-    {
-        if ($this->url_type === self::URL_TYPE_QUERY && ! empty($_GET)) {
-            $query = urldecode(http_build_query($_GET));
-            return "?$query&";
-        } else {
-            return '?';
-        }
-    }
-
-    public function getRelPrefix($curr_url = false)
-    {
-        if ($curr_url === false) {
-            if ($this->url_type === self::URL_TYPE_QUERY) {
-                return '.';
-            }
-            $curr_url = $this->getCurrURL(false);
-            $depth = substr_count($curr_url, '/') + $this->offset;
-        } else {
-            $depth = substr_count($curr_url, '/');
-        }
-        return ($depth > 0) ? rtrim(str_repeat('../', $depth), '/') : '.';
     }
 
     public function getDocsDir()
@@ -235,7 +138,7 @@ class DOCX_App
 
     public function dispatch()
     {
-        $curr_url = $this->getCurrURL(true);
+        $curr_url = $this->linkage->getCurrURL(true);
         $edit_mode = false;
         if (empty($curr_url) || in_array($curr_url, array('/', self::HOME_PAGE_URL))) {
             $curr_url = self::HOME_PAGE_URL;
@@ -272,13 +175,9 @@ class DOCX_App
     
     public function gotoStaticIfCould()
     {
-        $dir = dirname($this->getAbsPrefix());
-        if (starts_with($this->public_dir, APP_ROOT)) {
-            if ($subdir = substr($this->public_dir, strlen(APP_ROOT))) {
-                $dir .= $subdir;
-            }
+        if ($to_url = $this->linkage->exchangeDir($this->public_dir, APP_ROOT)) {
             $urlext = $this->getOption('urlext_html');
-            return http_redirect($dir . '/index' . $urlext);
+            return http_redirect($to_url . '/index' . $urlext);
         }
     }
 
@@ -299,16 +198,16 @@ class DOCX_App
 
     public function genPages($target_dir = false)
     {
-        if ($target_dir === false) {
-            $target_dir = $this->public_dir;
-        }
-        $urlext = $this->getOption('urlext_html');
-        $excludes = array('.', $this->index);
+        $excludes = array('.', $this->linkage->getIndex());
         if (starts_with($this->document_dir, $this->public_dir)) {
             //避免误删原始文档
             $excludes[] = trim(substr($this->document_dir, strlen($this->public_dir)), '/');
         }
         DOCX_Directory::removeAll($this->public_dir, $excludes);
+        if ($target_dir === false) {
+            $target_dir = $this->public_dir;
+        }
+        $urlext = $this->getOption('urlext_html');
         $docsdir = $this->getDocsDir();
         foreach ($docsdir->files as $dir => & $files) {
             foreach ($files as $file => & $metadata) {

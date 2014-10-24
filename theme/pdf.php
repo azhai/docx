@@ -30,11 +30,11 @@ article pre { color: #eaeaea; }
             <span style="float: left; font-size: 10px; color: gray;">
             <?php foreach($page['tags'] as $i => $tag):
                                 echo ($i > 0) ? ', ' : '标签：'; ?>
-            <!--a href="<?php echo $url_prefix .'tag/'. slugify($tag);?>"--><?php echo $tag;?><!--/a-->
+            <!--a href="<?php echo $urlpre .'tag/'. slugify($tag);?>"--><?php echo $tag;?><!--/a-->
             <?php endforeach; ?>
             </span> 
             <span style="float: right; font-size: 10px; color: gray;"> 
-            <!--a href="<?php echo $url_prefix .'author/'. slugify($page['author']);?>"-->
+            <!--a href="<?php echo $urlpre .'author/'. slugify($page['author']);?>"-->
             <?php echo $page['author']; ?><!--/a--> 写于 <?php echo zh_date($options['date_format'], $page['date']); ?> 
             </span>
         </div>

@@ -18,19 +18,19 @@
                         'urlpre' => $urlpre, 'urlext' => $urlext, 'curr_url' => $curr_url
                     )); ?>
                 </ul>
-                <?php if ($options['links']): ?>
-                <div class="well well-sidebar"> 
+                <div class="well well-sidebar">
+                    <?php if ($options['links']): ?>
                     <!-- Links -->
                     <?php foreach($options['links'] as $link_name => $link_url): ?>
-                    <a href="<?php echo $link_url; ?>" target="_blank"><?php echo $link_name;?></a><br>
+                    <a href="<?php echo $link_url; ?>" target="_blank"><?php echo $link_name; ?></a><br>
                     <?php endforeach; ?>
-                    <a href="<?php echo $url_join; ?>action=cleancache">重新缓存</a><br>
-                    <a href="<?php echo $url_join; ?>action=staticize">生成静态页</a><br>
+                    <?php endif; ?>
+                    <a href="<?php echo $linkage->buildQuery('action=cleancache'); ?>">重新缓存</a><br>
+                    <a href="<?php echo $linkage->buildQuery('action=staticize'); ?>">生成静态页</a><br>
                     <?php if ($options['wkhtmltopdf']): ?>
-                    <a href="<?php echo $url_join; ?>action=genpdf">生成PDF</a><br>
+                    <a href="<?php echo $linkage->buildQuery('action=genpdf'); ?>">生成PDF</a><br>
                     <?php endif; ?>
                 </div>
-                <?php endif; ?>
             </div>
         </div>
         
