@@ -4,7 +4,7 @@ defined('DOCX_ROOT') or define('DOCX_ROOT', dirname(APP_ROOT));
 defined('MINIFY_LIBRARY') or define('MINIFY_LIBRARY', true);
 
 $settings = array(
-    'url_prefix' => '/blog/index.php?q=',
+    'url_prefix' => '/docx/blog/index.php?q=',
     'title' => 'docx文档生成工具',
     'tagline' => '最简单的方式构建你的项目文档',
     'reading' => '开始阅读文档',
@@ -17,7 +17,7 @@ $settings = array(
     'theme_dir' => 'theme',                 #主题模板目录
     'assets_dir' => 'theme/assets',         #资源目录
     'cache_dir' => 'cache/blog',            #缓存目录
-    'cache_ext' => '.json',
+    'cache_ext' => '.yaml',
     'blog_sorting' => array('/PHP'),
     #需要安装wkhtmltopdf、fontconfig、一款中文字体如文泉驿
     #'wkhtmltopdf' => 'wkhtmltopdf',

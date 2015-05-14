@@ -47,7 +47,10 @@ class DOCX_App
         'github_repo' => false,             #github仓库url
         'links' => array(),                 #友情链接
         'google_analytics' => false,
-        'ignore' => array('folders' => array('.git', )),
+        'ignore' => array(
+            'folders' => array('.git', ),
+            'files' => array(),
+        ),
         #需要安装wkhtmltopdf、fontconfig、一款中文字体如文泉驿
         'wkhtmltopdf' => null,              #pdf工具路径
         'greetings' => array(),             #供随机展示的语录
@@ -206,6 +209,9 @@ class DOCX_App
         if (starts_with($this->document_dir, $this->public_dir)) {
             //避免误删原始文档
             $excludes[] = trim(substr($this->document_dir, strlen($this->public_dir)), '/');
+        }
+        if ($ignore = $this->getOption('ignore')) {
+            $excludes = array_merge($excludes, $ignore['folders'], $ignore['files']);
         }
         DOCX_Directory::removeAll($this->public_dir, $excludes);
         if ($target_dir === false) {
