@@ -255,6 +255,7 @@ class RepoHandler extends Viewhandler
         $repo->add();
         $repo->commit($comment);
         if (!$is_exists) {
+            $remote = $this->app->settings['publish_repo'];
             $repo->getGit()->remote($public_dir, 'add origin ' . $remote);
         }
         exit;
