@@ -257,6 +257,7 @@ class RepoHandler extends Viewhandler
         }
         $repo->add();
         $repo->commit($comment);
+        exit;
         
         /*
         $client = new Gitter\Client();
