@@ -6,13 +6,13 @@
 <html class="no-js" lang="zh">
 <!--<![endif]-->
 <head>
-<title><?php echo $page['title'] . ' - ' . $options['title']; ?></title>
+<title><?=$page['title'] . ' - ' . $options['title']?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="description" content="<?php echo $options['tagline'];?>" />
-<meta name="author" content="<?php echo $options['author']; ?>">
-<link rel="icon" href="<?php echo $assets_url; ?>/img/favicon.png" type="image/x-icon">
-<link rel="stylesheet" href="<?php echo $assets_url; ?>/css/style.min.css">
-<style rel="stylesheet">h1 a.html-hidden, div a.html-hidden<?php echo $html_hide; ?></style>
+<meta name="description" content="<?=$options['tagline'];?>" />
+<meta name="author" content="<?=$options['author']?>">
+<link rel="icon" href="<?=$assets_url?>/img/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="<?=$assets_url?>/css/style.min.css">
+<style rel="stylesheet">h1 a.html-hidden, div a.html-hidden<?=$html_hide?></style>
 <!-- Mobile -->
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,19 +20,19 @@
 <body>
 
 <!-- Docs -->
-<?php if ($is_home && $options['github_repo']): ?>
-<a href="https://github.com/<?php echo $options['github_repo']; ?>" target="_blank" id="github-ribbon" class="hidden-print">
-    <img src="<?php echo $assets_url; ?>/img/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+<?php if ($options['github_repo']): ?>
+<a href="https://github.com/<?=$options['github_repo']?>" target="_blank" id="github-ribbon" class="hidden-print">
+    <img src="<?=$assets_url?>/img/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
 </a>
 <?php endif; ?>
 <div class="navbar navbar-fixed-top hidden-print">
     <div class="container-fluid">
-        <a class="brand navbar-brand pull-left" href="<?php echo $urlpre . $home_url . $urlext; ?>"><?php echo $options['title']; ?></a>
-        <p class="navbar-text pull-right"> <?php echo rand_greeting($options['greetings']); ?> </p>
+        <a class="brand navbar-brand pull-left" href="<?=$urlpre?>"><?=$options['title']?></a>
+        <p class="navbar-text pull-right"> <?php echo \Docx\Common::randGreeting($options['greetings']); ?> </p>
     </div>
 </div>
 
-<?php echo $content; ?>
+<?=$this->block('content')?>
 
 <?php if ($options['google_analytics']): ?>
 <script>
@@ -41,19 +41,19 @@
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', '<?php echo $options['google_analytics'];?>', '<?php echo (isset($_SERVER['HTTP_HOST']))?$_SERVER['HTTP_HOST']:''; ?>');
+    ga('create', '<?=$options['google_analytics'];?>', '<?php echo (isset($_SERVER['HTTP_HOST']))?$_SERVER['HTTP_HOST']:''; ?>');
     ga('send', 'pageview');
 
 </script>
 <?php endif; ?>
 
-<script src="<?php echo $assets_url; ?>/js/jquery.min.js"></script> 
-<script src="<?php echo $assets_url; ?>/js/custom.js"></script> 
+<script src="<?=$assets_url?>/js/jquery.min.js"></script> 
+<script src="<?=$assets_url?>/js/custom.js"></script> 
 <!--[if lt IE 9]>
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
 
-<?php echo isset($scripts) ? $scripts : ''; ?>
+<?=$this->block('scripts')?>
 
 </body>
 </html>

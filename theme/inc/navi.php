@@ -1,37 +1,62 @@
+<?php
+$show_menu = function($node, $menu_url, $children = [])
+                use($curr_url, $relate_url, $urlext)
+{
+    $menu_url = trim($menu_url, '/');
+    $curr_url = trim($curr_url, '/');
+    $is_match = \Docx\Common::startsWith($curr_url, $menu_url);
+    if ($node['is_file']) {
+        $li_class = $is_match ? ' class="active"' : '';
+        return <<<EOD
+<li{$li_class}>
+<a href="{$relate_url}{$menu_url}{$urlext}">{$node['title']}</a>
+</li>
+EOD;
+    } else if (isset($node['nodes'])) {
+        $children = implode("\n", $children);
+        $li_class = $is_match ? ' class="open"' : '';
+        return <<<EOD
+<li{$li_class}>
+<a href="#" class="aj-nav folder">{$node['title']}</a>
+<ul class="nav nav-list">
+$children
+</ul>
+</li>
+EOD;
+    }
+};
 
-<?php
-$last_dir = '';
-foreach ($docs as $dir => & $files):
-    list($dir_url, $backward, $forward) = compare_pathes($dir, $last_dir);
-    if ($backward + $forward > 0):
-        echo str_repeat("    </ul>\n</li>\n", $backward);
-        $remain = substr($dir, strlen($dir_url));
-        $dir_url = ltrim($dir_url, '.');
-        $items = explode('/', trim($remain, '/'));
-        foreach ($items as $dir_item):
-            $dir_url .= '/' . $dir_item;
+$menus = \Docx\Utility\FileSystem::traverse($organiz['nodes'], $show_menu, '');
+
 ?>
-<li<?php echo starts_with($curr_url, $dir_url) ? ' class="open"' : ''; ?>>
-    <a href="#" class="aj-nav folder"><?php echo clean_ord($dir_item); ?></a>
+<!-- For Mobile -->
+<div class="responsive-collapse">
+    <button type="button" class="btn btn-sidebar" id="menu-spinner-button">
+    <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+    </button>
+</div>
+<div id="sub-nav-collapse" class="sub-nav-collapse">
+    <!-- Navigation -->
     <ul class="nav nav-list">
-<?php
+    <?=implode("\n", $menus)?>
+    </ul>
+    <div class="well well-sidebar">
+        <div><a href="#" id="toggleCodeBlockBtn" onclick="toggleCodeBlocks();">外置代码框</a></div>
+        <?php
+        if ($page_type !== 'html'):
+            echo '<div><a href="' . $urlpre . '/admin/staticize/">生成静态页</a></div>';
+            echo '<div><a href="' . $urlpre . '/admin/publish/">Git发布</a></div>';
+        endif;
+        ?>
+    </div>
+    <div class="well well-sidebar">
+        <!-- Links -->
+        <?php
+        if ($options['links']):
+        foreach($options['links'] as $link_name => $link_url):
+            echo '<div><a href="' . $link_url . '" target="_blank">' . $link_name . '</a></div>';
         endforeach;
-    endif;
-    $last_dir = $dir;
-    
-    foreach ($files as $file => & $metas):
-        if ($metas['slug'] === 'home'):
-            continue;
         endif;
-        if ($curr_url === $metas['url']):
-            echo '<li class="active"><a href="#">' . $metas['title'] . '</a></li>'; 
-            echo "\n";
-        else:
-            $link = $urlpre . $metas['url'] . $urlext;
-            echo '<li><a href="' . $link . '">' . $metas['title'] . '</a></li>'; 
-            echo "\n";
-        endif;
-    endforeach;
-endforeach;
-echo str_repeat("    </ul>\n</li>\n", substr_count($last_dir, '/'));
-?>
+        ?>
+    </div>
+</div>

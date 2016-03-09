@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>       <html class="no-js ie6 oldie" lang="zh"> <![endif]-->
+<!--[if IE 7]>          <html class="no-js ie7 oldie" lang="zh"> <![endif]-->
+<!--[if IE 8]>          <html class="no-js ie8 oldie" lang="zh"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="zh">
+<!--<![endif]-->
+<head>
+<title>安装Linux开发环境之五 —— LevelDB、Beanstalkd - docx文档生成工具</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="最简单的方式构建你的项目文档" />
+<meta name="author" content="Ryan Liu">
+<link rel="icon" href="../assets/img/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="../assets/css/style.min.css">
+<style rel="stylesheet">h1 a.html-hidden, div a.html-hidden</style>
+<!-- Mobile -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<!-- Docs -->
+<a href="https://github.com/azhai/docx" target="_blank" id="github-ribbon" class="hidden-print">
+    <img src="../assets/img/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+</a>
+<div class="navbar navbar-fixed-top hidden-print">
+    <div class="container-fluid">
+        <a class="brand navbar-brand pull-left" href="/docx/index.php">docx文档生成工具</a>
+        <p class="navbar-text pull-right"> 利用好PHP的过滤函数 – Joey Sochacki </p>
+    </div>
+</div>
+
+<div class="container-fluid fluid-height wrapper">
+    <div class="row columns content">
+        <div class="left-column article-tree col-sm-3 hidden-print">
+        <!-- For Mobile -->
+<div class="responsive-collapse">
+    <button type="button" class="btn btn-sidebar" id="menu-spinner-button">
+    <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+    </button>
+</div>
+<div id="sub-nav-collapse" class="sub-nav-collapse">
+    <!-- Navigation -->
+    <ul class="nav nav-list">
+    <li>
+<a href="../index.html">首页</a>
+</li>
+<li>
+<a href="#" class="aj-nav folder">Deploy</a>
+<ul class="nav nav-list">
+<li>
+<a href="../deploy/vim_config.html">VIM配置</a>
+</li>
+<li>
+<a href="../deploy/nginx_case_insensitive.html">让Nginx对URL不区分大小写</a>
+</li>
+<li>
+<a href="../deploy/rsync_config.html">Rsync配置与使用</a>
+</li>
+<li>
+<a href="../deploy/install_postfix.html">安装Postfix邮件服务器</a>
+</li>
+<li>
+<a href="../deploy/nginx_log_cookie.html">Nginx记录访问cookie到日志</a>
+</li>
+<li>
+<a href="../deploy/linux_upstart.html">Linux新的守护进程方式upstart</a>
+</li>
+<li>
+<a href="../deploy/nginx-http_base_auth.html">Nginx设置简单HTTP认证</a>
+</li>
+<li>
+<a href="../deploy/nginx_logrotate.html">Nginx日志按日期切割</a>
+</li>
+<li>
+<a href="../deploy/samba_conf.html">Samba简单配置</a>
+</li>
+</ul>
+</li>
+<li class="open">
+<a href="#" class="aj-nav folder">CentOS</a>
+<ul class="nav nav-list">
+<li>
+<a href="../centos/centos_install_mysql.html">安装Linux开发环境之一 —— MySQL</a>
+</li>
+<li>
+<a href="../centos/centos_install_php.html">安装Linux开发环境之二 —— PHP</a>
+</li>
+<li>
+<a href="../centos/centos_install_nginx.html">安装Linux开发环境之三 —— Nginx</a>
+</li>
+<li>
+<a href="../centos/centos_install_redis.html">安装Linux开发环境之四 —— Redis</a>
+</li>
+<li class="active">
+<a href="../centos/centos_install_leveldb_beanstalkd.html">安装Linux开发环境之五 —— LevelDB、Beanstalkd</a>
+</li>
+<li>
+<a href="../centos/centos_install_lamp.html">在CentOS上部署lamp环境</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">PHP</a>
+<ul class="nav nav-list">
+<li>
+<a href="../php/zf2-multiple_dbs.html">Zend Framework 2 配置多个数据库</a>
+</li>
+<li>
+<a href="../php/weight_rrd.html">PHP权重轮询</a>
+</li>
+<li>
+<a href="../php/phpunit_boot.html">启动PHPUnit测试的简便方式</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">Python</a>
+<ul class="nav nav-list">
+<li>
+<a href="../python/python_pop3.html">通过POP3协议读取指定邮件</a>
+</li>
+<li>
+<a href="../python/python_pinyin.html">GB2312中文转拼音</a>
+</li>
+<li>
+<a href="../python/python_md5.html">Python计算文件的MD5</a>
+</li>
+<li>
+<a href="../python/python_mulpti_logging.html">Python多进程记录日志</a>
+</li>
+<li>
+<a href="../python/python_paginate.html">一个Python分页</a>
+</li>
+<li>
+<a href="../python/python_urlib.html">Python网址操作函数</a>
+</li>
+<li>
+<a href="../python/python_pymssql_re2.html">安装Python支持SqlServer和re2</a>
+</li>
+<li>
+<a href="../python/python_functions.html">收集用过的一些Python方法</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">Tool</a>
+<ul class="nav nav-list">
+<li>
+<a href="../tool/git_push.html">正确使用git避免提交冲突</a>
+</li>
+<li>
+<a href="../tool/haskell_mysql_dumper.html">MySQL导出CSV文件（Haskell实现）</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">Help</a>
+<ul class="nav nav-list">
+<li>
+<a href="../help/github-flavored-markdown.html">Markdown 语法</a>
+</li>
+</ul>
+</li>    </ul>
+    <div class="well well-sidebar">
+        <div><a href="#" id="toggleCodeBlockBtn" onclick="toggleCodeBlocks();">外置代码框</a></div>
+            </div>
+    <div class="well well-sidebar">
+        <!-- Links -->
+        <div><a href="https://coding.net/u/azhai/p/docx/git" target="_blank">Coding仓库</a></div><div><a href="http://git.oschina.net/azhai/docx" target="_blank">OSChina仓库</a></div><div><a href="http://todaymade.com" target="_blank">Todaymade出品Daux.io</a></div><div><a href="http://blog.emx2.co.uk" target="_blank">Xin Meng翻译文档</a></div>    </div>
+</div>        </div>
+
+        <div class="right-column content-area col-sm-9">
+            <div class="content-page">
+                <article>
+                    <div class="page-header sub-header clearfix">
+                        <h1>安装Linux开发环境之五 —— LevelDB、Beanstalkd
+</h1>
+                        <span style="float: left; font-size: 10px; color: gray;">
+                        标签：linux, leveldb, beanstalkd                        </span>
+                        <span style="float: right; font-size: 10px; color: gray;">
+                        <!--a href="/docx/index.phpauthor/ryan-liu"-->
+                        Ryan Liu<!--/a--> 写于 2013年3月8日 星期五                        </span>
+                    </div>
+
+                    <h2>下载编译LevelDB备用</h2>
+<pre><code class="language-bash">wget http://leveldb.googlecode.com/files/leveldb-1.9.0.tar.gz
+tar xzf leveldb-1.9.0.tar.gz -C /opt/
+cd /opt/leveldb-1.9.0
+make
+ln -s /opt/leveldb-1.9.0/libleveldb.so.1.9 /usr/lib64/libleveldb.so
+cd -</code></pre>
+<h2>安装编译php-leveldb客户端</h2>
+<pre><code class="language-bash">wget https://github.com/reeze/php-leveldb/archive/V0.1.1.tar.gz
+mv V0.1.1.tar.gz php-leveldb-0.1.1.tar.gz
+tar xzf php-leveldb-0.1.1.tar.gz
+cd php-leveldb-0.1.1
+phpize
+./configure --with-leveldb=/opt/leveldb-1.9.0
+make &amp;&amp; make install
+cd ..</code></pre>
+<p>参考 <a href="https://github.com/nil-zhang/php-beanstalk/"><a href="https://github.com/nil-zhang/php-beanstalk/">https://github.com/nil-zhang/php-beanstalk/</a></a></p>
+<h2>下载安装Beanstalkd</h2>
+<pre><code class="language-bash">wget https://github.com/kr/beanstalkd/archive/v1.9.tar.gz
+mv v1.9.tar.gz beanstalkd-1.9.tar.gz
+tar xzf beanstalkd-1.9.tar.gz
+cd beanstalkd-1.9
+sed -i '1cPREFIX=/opt/beanstalkd-1.9' Makefile
+make &amp;&amp; make install
+cd ..</code></pre>
+<h2>安装C客户端libbeanstalkclient</h2>
+<pre><code class="language-bash">#安装libtool
+yum install libtool
+#下载安装C客户端
+wget https://github.com/bergundy/libbeanstalkclient/tarball/master --no-check-certificate
+mv master libbeanstalkclient.tar.gz
+tar xzf libbeanstalkclient.tar.gz
+cd bergundy-libbeanstalkclient-b6ec294/
+sed -i '6c./configure --prefix=/opt/libbeanstalkclient' autogen.sh
+./autogen.sh
+#添加到ld.so.conf
+echo "/opt/libbeanstalkclient/lib" &gt; /etc/ld.so.conf.d/libbeanstalkclient.conf
+ldconfig
+cd ..</code></pre>
+<h2>安装PHP客户端</h2>
+<pre><code class="language-bash">wget https://github.com/nil-zhang/php-beanstalk/tarball/master --no-check-certificate
+mv master php-beanstalk.tar.gz
+tar xzf php-beanstalk.tar.gz
+cd nil-zhang-php-beanstalk-098935b/
+phpize
+./configure --with-libbeanstalkclient-dir=/opt/libbeanstalkclient
+make &amp;&amp; make install
+cd ..</code></pre>
+<h2>添加PHP扩展到php.ini，重启php-fpm服务</h2>
+<pre><code class="language-bash">ln -s /opt/beanstalkd-1.9/bin/beanstalkd /usr/bin/beanstalkd
+sed -i '1aextension=leveldb.so' /etc/php5/fpm/php.ini
+sed -i '1aextension=beanstalk.so' /etc/php5/fpm/php.ini
+ps -efww | grep php-fpm | grep -v grep | cut -c 9-15 | xargs kill -9
+php-fpm -c /etc/php5/fpm/php.ini -y /etc/php5/fpm/php-fpm.conf -D</code></pre>                </article>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="../assets/js/jquery.min.js"></script> 
+<script src="../assets/js/custom.js"></script> 
+<!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<!-- hightlight.js -->
+<script src="../assets/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
