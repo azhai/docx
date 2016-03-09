@@ -252,11 +252,11 @@ class RepoHandler extends Viewhandler
         
         $is_exists = is_dir($public_dir . DS . '.git');
         $repo = \TQ\Git\Repository\Repository::open($public_dir, 'git', true);
+        $repo->add();
+        $repo->commit($comment);
         if (!$is_exists) {
             $repo->getGit()->remote($public_dir, 'add origin ' . $remote);
         }
-        $repo->add();
-        $repo->commit($comment);
         exit;
         
         /*
