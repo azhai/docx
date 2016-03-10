@@ -14,7 +14,7 @@
                         <h1><?php
                             echo $page['title'] . "\n";
                             if ($page_type !== 'html'):
-                                $edit_doc_url = $urlpre . '/admin/' . $curr_url . '/';
+                                $edit_doc_url = $urlpre . 'admin/' . $curr_url . '/';
                                 echo '<a id="editThis" href="' . $edit_doc_url . '" class="btn html-hidden">编辑文档</a>';
                             endif;
                         ?></h1>
@@ -27,8 +27,8 @@
                         ?>
                         </span>
                         <span style="float: right; font-size: 10px; color: gray;">
-                        <!--a href="<?=$urlpre .'author/'. \Docx\Common::slugify($page['author']);?>"-->
-                        <?=$page['author']?><!--/a--> 写于 <?php echo \Docx\Common::zhdate($options['date_format'], $page['date']); ?>
+                        <!--a href="<?=$urlpre .'author/'. hp_slugify($page['author']);?>"-->
+                        <?=$page['author']?><!--/a--> 写于 <?php echo hp_zhdate($options['date_format'], $page['date']); ?>
                         </span>
                     </div>
 

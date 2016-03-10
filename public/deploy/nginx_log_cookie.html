@@ -25,7 +25,7 @@
 </a>
 <div class="navbar navbar-fixed-top hidden-print">
     <div class="container-fluid">
-        <a class="brand navbar-brand pull-left" href="/docx/index.php">docx文档生成工具</a>
+        <a class="brand navbar-brand pull-left" href="../index.html">docx文档生成工具</a>
         <p class="navbar-text pull-right"> 使用IDE, Templates和Snippets加速PHP开发 – Chad Kieffer </p>
     </div>
 </div>
@@ -179,7 +179,7 @@
                         <span style="float: left; font-size: 10px; color: gray;">
                         标签：nginx, log, cookie, php                        </span>
                         <span style="float: right; font-size: 10px; color: gray;">
-                        <!--a href="/docx/index.phpauthor/ryan-liu"-->
+                        <!--a href="../author/ryan-liu"-->
                         Ryan Liu<!--/a--> 写于 2013年4月23日 星期二                        </span>
                     </div>
 
@@ -187,12 +187,12 @@
 <p>在某个PHP网站的日志中记录下session id，比使用ip地址能更好地跟踪用户访问</p>
 <h2>解决方法</h2>
 <p>在nginx.conf的http中增加一种日志格式</p>
-<pre><code>log_format  sess  &amp;#39;$remote_addr - $remote_user [$time_local] &amp;#34;$request&amp;#34; &amp;#39;
-                  &amp;#39;$status $body_bytes_sent &amp;#34;$http_referer&amp;#34; &amp;#39;
-                  &amp;#39;&amp;#34;$http_user_agent&amp;#34; &amp;#34;$http_x_forwarded_for&amp;#34; &amp;#34;$phpsessid&amp;#34;&amp;#39;</code></pre>
+<pre><code>log_format  sess  '$remote_addr - $remote_user [$time_local] "$request" '
+                  '$status $body_bytes_sent "$http_referer" '
+                  '"$http_user_agent" "$http_x_forwarded_for" "$phpsessid"'</code></pre>
 <p>在对应网站的server中添加</p>
-<pre><code>set $phpsessid &amp;#34;-&amp;#34;;
-if ( $http_cookie ~* &amp;#34;PHPSESSID=(\S+)(;.*|$)&amp;#34;)
+<pre><code>set $phpsessid "-";
+if ( $http_cookie ~* "PHPSESSID=(\S+)(;.*|$)")
 {
     set $phpsessid $1;
 }

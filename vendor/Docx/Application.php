@@ -28,7 +28,6 @@ class Application
     ];
     protected $shortcuts = []; // 快捷方式
     public $settings = []; // 配置
-    public $errors = [];
 
     /**
      * 私有构造函数，防止在类外创建对象
@@ -38,11 +37,15 @@ class Application
         if (version_compare(PHP_VERSION, '7.0.0') < 0) {
             Common::throwWarnings();
         }
-        date_default_timezone_set($this->settings['timezone']);
+        if (isset($settings['timezone'])) {
+            date_default_timezone_set($settings['timezone']);
+        }
         if (Common::isCLI()) {
-            ini_set('display_errors', 1);
-            ini_set ('memory_limit', $this->settings['memory_limit']);
             set_time_limit(0);
+            ini_set('display_errors', 1);
+            if (isset($settings['memory_limit'])) {
+                ini_set('memory_limit', $settings['memory_limit']);
+            }
         }
         $importer = \Docx\Importer::getInstance();
         $this->installRef($importer, ['import', 'introduce', 'addClass']);
@@ -144,26 +147,36 @@ class Application
         if (!$route) {
             return die();
         }
-        $this->setProp('route', $route);
-        $method = $this->request->getMethod();
-        if ($method === 'post') {
-            $method = $this->request->getString('_method', 'post');
-        }
         
-        $output = '';
+        $backend = null;
         foreach ($route['handlers'] as $handler) {
             if (empty($handler)) {
                 continue;
             }
             if (is_string($handler) && class_exists($handler, true)) {
-                $handler = new $handler($this, $method);
+                $handler = new $handler($this, $backend);
             }
-            if (is_callable($handler)) {
-                try {
-                    $output = Common::execFunctionArray($handler, $route['args']);
-                } catch (\Exception $e) {
-                    $method = 'fail';
-                    $this->errors[] = $e;
+            $backend = $handler;
+        }
+        
+        $method = $this->request->getMethod();
+        if ($method === 'post') {
+            $method = $this->request->getString('_method', 'post');
+        }
+        if (!($handler instanceof \Closure)) {
+            $handler->globals['method'] = $method;
+            $handler->globals['path'] = $path;
+            $handler->globals['url'] = $route['url'];
+            $handler->globals['rule'] = $route['rule'];
+            $handler->globals['args'] = $route['args'];
+        }
+        $output = '';
+        if (is_callable($handler)) {
+            try {
+                $output = Common::execFunctionArray($handler, $route['args']);
+            } catch (\Exception $error) {
+                if (method_exists($handler, 'except')) {
+                    $output = $handler->except($error);
                 }
             }
         }

@@ -16,16 +16,16 @@ comments:   true
 
 
 
-    log_format  sess  &#39;$remote_addr - $remote_user [$time_local] &#34;$request&#34; &#39;
-                      &#39;$status $body_bytes_sent &#34;$http_referer&#34; &#39;
-                      &#39;&#34;$http_user_agent&#34; &#34;$http_x_forwarded_for&#34; &#34;$phpsessid&#34;&#39;
+    log_format  sess  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for" "$phpsessid"'
 
 在对应网站的server中添加
 
 
 
-    set $phpsessid &#34;-&#34;;
-    if ( $http_cookie ~* &#34;PHPSESSID=(\S+)(;.*|$)&#34;)
+    set $phpsessid "-";
+    if ( $http_cookie ~* "PHPSESSID=(\S+)(;.*|$)")
     {
         set $phpsessid $1;
     }

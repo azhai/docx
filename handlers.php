@@ -2,6 +2,7 @@
 
 use Docx\Common;
 use Docx\Cache;
+use Docx\Web\Handler;
 use Docx\Web\Response;
 use Docx\Utility\FileSystem;
 use Docx\Utility\Markdoc;
@@ -11,52 +12,12 @@ defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 
 
 /**
- * 基本控制器.
- */
-class Handler
-{
-    use \Docx\Base\Behavior;
-
-    protected $app = null;
-    protected $method = 'get';
-    protected $template = '';
-    protected $context = [];
-    protected $globals = [];
-
-    public function __construct(& $app, $method = 'get')
-    {
-        $this->app = $app;
-        $this->method = strtolower($method);
-    }
-
-    public function __invoke()
-    {
-        $this->prepare();
-        $action = $this->method . 'Action';
-        $args = func_get_args();
-        Common::execMethodArray($this, $action, $args);
-        $this->finish();
-        return $this;
-    }
-
-    public function __toString()
-    {
-        $response = new Response($this->template);
-        $response->globals = array_merge($response->globals, $this->globals);
-        return $response->render($this->context);
-    }
-}
-
-
-/**
  * 显示页面.
  */
-class Viewhandler extends Handler
+class ViewHandler extends Handler
 {
-    protected $docs = null;
-    protected $cache = null;
-    protected $organiz = [];
     protected $page_type = 'view';
+    protected $organiz = [];
     
     public function locate($source_dir, $url)
     {
@@ -71,78 +32,86 @@ class Viewhandler extends Handler
         return $source_dir . DS . $node['path'];
     }
     
-    /**
-     *
-     */
-    public function prepare($curr_url)
-    {
-        $settings = $this->app->settings;
-        $this->globals['options'] = $settings;
-        $this->globals['curr_url'] = $curr_url;
-        $this->globals['urlpre'] = $settings['urlpre'];
-        $depth = substr_count(trim($curr_url, '/'), '/');
-        //offset = doc:1 edit:2 html:0 home:-1
-        $this->globals['page_type'] = $this->page_type;
-        if ($this->page_type === 'html') {
-            $this->globals['urlext'] = '.html';
-            $this->globals['relate_url'] = str_repeat('../', $depth);
-            $this->globals['assets_url'] = $this->globals['relate_url'] . $settings['assets_dir'];
-        } else {
-            $this->globals['urlext'] = '/';
-            $this->globals['assets_url'] = $settings['public_dir'] . '/' . $settings['assets_dir'];
-            if ($this->page_type === 'home') {
-                $this->globals['relate_url'] = 'index.php/';
-            } else {
-                $depth += ($this->page_type === 'edit' ? 2 : 1);
-                $this->globals['relate_url'] = str_repeat('../', $depth);
-                $this->globals['assets_url'] = '../' . $this->globals['relate_url'] . $this->globals['assets_url'];
-            }
-        }
-        $this->globals['theme_dir'] = APP_ROOT . DS . $settings['theme_dir'];
-    }
-    
     public function scanDocs($source_dir)
     {
         $settings = $this->app->settings;
-        $this->docs = new FileSystem('.md');
-        $this->cache = new Cache\CacheBox();
+        $fs = new FileSystem('.md');
+        $cache = new Cache\CacheBox();
         $cache_dir = APP_ROOT . DS . $settings['cache_dir'];
         $yaml_cache = new Cache\FileCache($cache_dir, $settings['cache_ext']);
-        $this->cache->attach($yaml_cache);
-        $this->organiz = $this->docs->getOrganiz($source_dir, $this->cache);
+        $cache->attach($yaml_cache);
+        $this->organiz = $fs->getOrganiz($source_dir, $cache);
         $this->globals['organiz'] = $this->organiz;
     }
     
-    public function parseDoc($nodepath)
+    public function readDoc($nodepath)
     {
-        $doc = new Markdoc($nodepath);
+        return new Markdoc($nodepath);
+    }
+    
+    public function parseDoc(Markdoc& $doc)
+    {
         $layout = $doc->getMetaData('layout');
         if (empty($layout)) {
             $layout = $this->app->settings['layout'];
         }
         $this->context['page'] = $doc->getPageData();
-        $this->template = $this->globals['theme_dir'] . DS . $layout . '.php';
+        $this->globals['layout'] = $layout;
     }
-
-    public function finish()
+    
+    public function getCurrURL()
     {
-    }
-
-    public function __invoke()
-    {
-        $curr_url = trim(func_get_arg(0), '/');
+        if ($this->globals['args']) {
+            $curr_url = trim($this->globals['args'][0], '/');
+        }
         if (empty($curr_url)) {
             $curr_url = 'index';
             $this->page_type = 'home';
         }
-        $this->prepare($curr_url);
-        $public_dir = APP_ROOT . DS . $this->app->settings['public_dir'];
-        $source_dir = $public_dir . DS . $this->app->settings['source_dir'];
+        return $curr_url;
+    }
+    
+    public function parseURL($curr_url = '')
+    {
+        if (empty($curr_url)) {
+            $curr_url = $this->getCurrURL();
+        }
+        $this->globals['curr_url'] = $curr_url;
+        $this->globals['page_type'] = $this->page_type;
+        
+        $settings = $this->app->settings;
+        $assets_url = $settings['public_dir'] . '/' . $settings['assets_dir'];
+        if ($this->page_type === 'home') {
+            $this->globals['urlpre'] = 'index.php/';
+            $this->globals['assets_url'] = $assets_url;
+        } else {
+            $depth = substr_count(trim($curr_url, '/'), '/');
+            $depth += ($this->page_type === 'edit' ? 2 : 1);
+            $this->globals['urlpre'] = str_repeat('../', $depth);
+            $this->globals['assets_url'] = '../' . $this->globals['urlpre'] . $assets_url;
+        }
+        return $curr_url;
+    }
+    
+    public function prepare()
+    {
+        $settings = $this->app->settings;
+        $this->globals['options'] = $settings;
+        $this->globals['theme_dir'] = APP_ROOT . DS . $settings['theme_dir'];
+        $this->globals['urlext'] = '/';
+    }
+
+    public function getAction()
+    {
+        $settings = $this->app->settings;
+        $public_dir = APP_ROOT . DS . $settings['public_dir'];
+        $source_dir = $public_dir . DS . $settings['source_dir'];
         $this->scanDocs($source_dir);
+        $curr_url = $this->parseURL();
         $nodepath = $this->locate($source_dir, $curr_url);
-        $this->parseDoc($nodepath);
-        $this->finish();
-        return $this;
+        $doc = $this->readDoc($nodepath);
+        $this->parseDoc($doc);
+        $this->template = $this->globals['theme_dir'] . DS . $this->globals['layout'] . '.php';
     }
 }
 
@@ -150,41 +119,55 @@ class Viewhandler extends Handler
 /**
  * 编辑页面.
  */
-class EditHandler extends Viewhandler
+class EditHandler extends ViewHandler
 {
     protected $page_type = 'edit';
     
-    public function parseDoc($nodepath)
+    public function updateDoc(Markdoc& $doc)
     {
-        $doc = new Markdoc($nodepath);
-        if ($this->method === 'post') {
-            $metatext = $this->app->request->getPost('metatext');
-            $markdown = $this->app->request->getPost('markdown');
-            $doc->update($metatext, trim($markdown));
-        }
-        $layout = $doc->getMetaData('layout');
-        if (empty($layout)) {
-            $layout = $this->app->settings['layout'];
-        }
-        $this->context['page'] = $doc->getPageData();
-        if (empty($layout)) {
-            $layout = $this->app->settings['layout'];
-        }
-        if ($this->method === 'get') {
-            $layout = 'edit' . DS . $layout;
-        }
-        $this->template = $this->globals['theme_dir'] . DS . $layout . '.php';
+        $request = $this->app->request;
+        $metatext = $request->getPost('metatext');
+        $metatext = htmlspecialchars_decode($metatext, ENT_QUOTES);
+        $markdown = $request->getPost('markdown');
+        $markdown = htmlspecialchars_decode(trim($markdown), ENT_QUOTES);
+        $doc->update($metatext, $markdown);
+    }
+    
+    public function staticize($curr_url)
+    {
+        $public_dir = APP_ROOT . DS . $this->app->settings['public_dir'];
+        $html_file = $public_dir . DS . $curr_url . '.html';
+        @mkdir(dirname($html_file), 0755, true);
+        file_put_contents($html_file, strval($this), LOCK_EX);
     }
 
-    public function finish()
+    public function getAction()
     {
-        if ($this->method === 'post') {
-            $public_dir = APP_ROOT . DS . $this->app->settings['public_dir'];
-            $curr_url = $this->globals['curr_url'];
-            $html_file = $public_dir . DS . $curr_url . '.html';
-            @mkdir(dirname($html_file), 0755, true);
-            file_put_contents($html_file, strval($this), LOCK_EX);
-        }
+        $settings = $this->app->settings;
+        $public_dir = APP_ROOT . DS . $settings['public_dir'];
+        $source_dir = $public_dir . DS . $settings['source_dir'];
+        $this->scanDocs($source_dir);
+        $curr_url = $this->parseURL();
+        $nodepath = $this->locate($source_dir, $curr_url);
+        $doc = $this->readDoc($nodepath);
+        $this->parseDoc($doc);
+        $this->globals['layout'] = 'edit' . DS . $this->globals['layout'];
+        $this->template = $this->globals['theme_dir'] . DS . $this->globals['layout'] . '.php';
+    }
+    
+    public function postAction()
+    {
+        $settings = $this->app->settings;
+        $public_dir = APP_ROOT . DS . $settings['public_dir'];
+        $source_dir = $public_dir . DS . $settings['source_dir'];
+        $this->scanDocs($source_dir);
+        $curr_url = $this->parseURL();
+        $nodepath = $this->locate($source_dir, $curr_url);
+        $doc = $this->readDoc($nodepath);
+        $this->updateDoc($doc);
+        $this->parseDoc($doc);
+        $this->template = $this->globals['theme_dir'] . DS . $this->globals['layout'] . '.php';
+        $this->staticize($curr_url);
     }
 }
 
@@ -192,22 +175,51 @@ class EditHandler extends Viewhandler
 /**
  * 生成静态页.
  */
-class HtmlHandler extends Viewhandler
+class HtmlHandler extends ViewHandler
 {
     protected $page_type = 'html';
     
-    public function __invoke()
+    public function parseURL($curr_url = '')
     {
-        $public_dir = APP_ROOT . DS . $this->app->settings['public_dir'];
+        if (empty($curr_url)) {
+            $curr_url = $this->getCurrURL();
+        }
+        $this->globals['curr_url'] = $curr_url;
+        $this->globals['page_type'] = $this->page_type;
+        
+        $settings = $this->app->settings;
+        $depth = substr_count(trim($curr_url, '/'), '/');
+        $this->globals['urlpre'] = str_repeat('../', $depth);
+        $this->globals['assets_url'] = $this->globals['urlpre'] . $settings['assets_dir'];
+        return $curr_url;
+    }
+    
+    public function prepare()
+    {
+        parent::prepare();
+        $this->globals['urlext'] = '.html';
+    }
+
+    public function finish()
+    {
+        $home_url = '../../' . $this->globals['urlpre'];
+        $public_dir = $this->app->settings['public_dir'];
+        return Response::redirect($home_url . $public_dir . '/');
+    }
+
+    public function getAction()
+    {
+        $settings = $this->app->settings;
+        $public_dir = APP_ROOT . DS . $settings['public_dir'];
+        $source_dir = $public_dir . DS . $settings['source_dir'];
+        FileSystem::removeEmptyDirs($source_dir, 1);
+        $this->scanDocs($source_dir);
         $ignores = [
             $public_dir . DS . '.git',
             $public_dir . DS . $this->app->settings['source_dir'],
             $public_dir . DS . $this->app->settings['assets_dir'],
         ];
         FileSystem::removeAllFiles($public_dir, $ignores);
-        $source_dir = $public_dir . DS . $this->app->settings['source_dir'];
-        FileSystem::removeEmptyDirs($source_dir, 1);
-        $this->scanDocs($source_dir);
         
         $handler = $this;
         $staticize = function($node, $curr_url, $children = [])
@@ -216,26 +228,16 @@ class HtmlHandler extends Viewhandler
             if ($node['is_file'] === 0) {
                 return;
             }
-            $handler->prepare($curr_url);
             $nodepath = $source_dir . DS . $node['path'];
-            $handler->parseDoc($nodepath);
+            $doc = $handler->readDoc($nodepath);
+            $handler->parseDoc($doc);
+            $handler->parseURL($curr_url);
+            $handler->template = $handler->globals['theme_dir'] . DS . $handler->globals['layout'] . '.php';
             $html_file = $public_dir . DS . $curr_url . '.html';
             @mkdir(dirname($html_file), 0755, true);
             file_put_contents($html_file, strval($handler), LOCK_EX);
         };
         FileSystem::traverse($this->organiz['nodes'], $staticize);
-        $this->finish();
-        return $this;
-    }
-
-    public function finish()
-    {
-        $home_url = $this->app->settings['urlpre'];
-        if (Common::endsWith($home_url, '/index.php')) {
-            $home_url = substr($home_url, 0, - strlen('/index.php'));
-        }
-        $dir = $this->app->settings['public_dir'];
-        return Response::redirect($home_url . '/' . $dir . '/index.html');
     }
 }
 
@@ -243,35 +245,41 @@ class HtmlHandler extends Viewhandler
 /**
  * Git发布.
  */
-class RepoHandler extends Viewhandler
+class RepoHandler extends Handler
 {
-    public function __invoke()
+    protected $repo = null;
+    
+    public function prepare()
     {
-        $comment = $this->app->request->getPost('comment', 'Nothing');
-        $public_dir = APP_ROOT . DS . $this->app->settings['public_dir'];
-        $branch = $this->app->settings['publish_branch'];
+        $settings = $this->app->settings;
+        $public_dir = APP_ROOT . DS . $settings['public_dir'];
         if (!is_dir($public_dir . DS . '.git')) {
-            $remote = $this->app->settings['publish_repo'];
-            $repo = Repository::create($public_dir, $remote);
+            $remote = $settings['repo_url'];
+            if (isset($settings['repo_user']) && $settings['repo_pass']) {
+                $remote = Repository::buildRemotePath($remote,
+                            $settings['repo_user'], $settings['repo_pass']);
+            }
+            $this->repo = Repository::create($public_dir, $remote);
         } else {
-            $repo = Repository::open($public_dir);
+            $this->repo = Repository::open($public_dir);
         }
-        
-        $repo->add();
-        $repo->commitMutely($comment);
-        $repo->checkout('-b', $branch);
-        try {
-            $repo->push('origin', $branch, '--tags');
-        } catch (\Exception $e) {
-            echo strval($e);
-        }
-        $this->finish();
-        return $this;
     }
 
     public function finish()
     {
-        $home_url = $this->app->settings['urlpre'];
+        $home_url = $this->globals['urlpre'];
         return Response::redirect($home_url);
+    }
+    
+    public function getAction()
+    {
+        $request = $this->app->request;
+        $comment = $request->getPost('comment', 'Nothing');
+        $settings = $this->app->settings;
+        $branch = $settings['repo_branch'];
+        $this->repo->add();
+        $this->repo->commitMutely($comment);
+        $this->repo->checkout('-b', $branch);
+        $this->repo->push('origin', $branch, '--tags');
     }
 }

@@ -33,6 +33,7 @@ class Router
         '<string>' => '([a-z0-9\-_]+)',
         '<page>' => '([0-9]*)/?([0-9]*)/?',
         '<path>' => '([a-z0-9\-_/]*)',
+        '<word>' => '([^/]*)',
     ];
     protected static $current = null;
     protected $filename = '';

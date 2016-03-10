@@ -31,17 +31,17 @@
                     <div class="page-header sub-header clearfix">
                         <h1><?php 
                             echo $page['title'] . "\n";
-                            $view_doc_url = $urlpre . '/' . $curr_url . '/';
+                            $view_doc_url = $urlpre . $curr_url . '/';
                             echo '<a id="editThis" href="' . $view_doc_url . '" class="closeEditor btn btn-warning">关闭</a>';
                         ?></h1>
                         <span style="float: left; font-size: 10px; color: gray;">
                         <?php foreach($page['tags'] as $i => $tag):
                                             echo ($i > 0) ? ', ' : '标签：'; ?>
-                        <!--a href="<?=$urlpre .'tag/'. \Docx\Common::slugify($tag);?>"--><?=$tag;?><!--/a-->
+                        <!--a href="<?=$urlpre .'tag/'. hp_slugify($tag);?>"--><?=$tag;?><!--/a-->
                         <?php endforeach; ?>
                         </span> 
-                        <span style="float: right; font-size: 10px; color: gray;"> 
-                        <!--a href="<?=$urlpre .'author/'. \Docx\Common::slugify($page['author']);?>"--><?=$page['author']?><!--/a--> 写于 <?php echo \Docx\Common::zhdate($options['date_format'], $page['date']); ?> 
+                        <span style="float: right; font-size: 10px; color: gray;">
+                        <!--a href="<?=$urlpre .'author/'. hp_slugify($page['author']);?>"--><?=$page['author']?><!--/a--> 写于 <?php echo hp_zhdate($options['date_format'], $page['date']); ?> 
                         </span>
                     </div>
                     

@@ -38,7 +38,7 @@
                         <a href="https://github.com/<?=$options['github_repo']?>"
                                 class="btn btn-secondary btn-hero"> 前往GitHub </a>
                         <?php endif; ?>
-                        <a href="<?=$urlpre . '/index/'?>" class="btn btn-primary btn-hero">
+                        <a href="<?=$urlpre . 'index' . $urlext?>" class="btn btn-primary btn-hero">
                         <?=$options['reading']?>
                         </a> </div>
                 </div>

@@ -28,9 +28,10 @@ class Response
     /**
      * 构造函数.
      */
-    public function __construct($entry_file = '')
+    public function __construct($entry_file = '', array $globals = [])
     {
         $this->addFrameFile($entry_file);
+        $this->addGlobals($globals);
     }
 
     /**
@@ -65,8 +66,19 @@ class Response
     {
         $status_code = $permanent ? 301 : 302;
         self::header('Location', $to_url, true, $status_code);
-
         return die(); //阻止运行后面的代码
+    }
+
+    /**
+     * 添加全局变量.
+     *
+     * @param array $data 变量数组
+     * @return \Docx\Web\Response
+     */
+    public function addGlobals(array $globals)
+    {
+        $this->globals = array_merge($this->globals, $globals);
+        return $this;
     }
 
     /**
@@ -80,7 +92,6 @@ class Response
         if ($frame_file && is_readable($frame_file)) {
             $this->frame_files[] = $frame_file;
         }
-
         return $this;
     }
 
@@ -95,8 +106,20 @@ class Response
         if ($layout_file && is_readable($layout_file)) {
             array_unshift($this->frame_files, $layout_file);
         }
-
         return $this;
+    }
+
+    /**
+     * 包含模板文件.
+     *
+     * @param string $frame_file 模板文件
+     */
+    public function includeTpl($frame_file)
+    {
+        if ($frame_file && is_readable($frame_file)) {
+            extract($this->globals);
+            include $frame_file;
+        }
     }
 
     /**
@@ -134,19 +157,6 @@ class Response
     }
 
     /**
-     * 包含模板文件.
-     *
-     * @param string $frame_file 模板文件
-     */
-    public function includeTpl($frame_file)
-    {
-        if ($frame_file && is_readable($frame_file)) {
-            extract($this->globals);
-            include $frame_file;
-        }
-    }
-
-    /**
      * 设置文档类型和字符集
      *
      * @param string $type 文档类型
@@ -159,7 +169,6 @@ class Response
         $this->charset = strval($charset);
         $line = $this->mime_type . '; charset=' . $this->charset;
         self::header('Content-Type', $line);
-
         return $this;
     }
 
@@ -177,7 +186,6 @@ class Response
         while ($frame_file = array_pop($this->frame_files)) {
             include $frame_file;
         }
-
         return trim(ob_get_clean());
     }
 }

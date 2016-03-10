@@ -8,6 +8,9 @@
 
 namespace Docx\Utility;
 
+$importer = \Docx\Importer::getInstance();
+$importer->addClass(VENDOR_DIR . '/Parsedown.php', 'Parsedown');
+
 
 /**
  * MarkDown文档

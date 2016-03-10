@@ -20,15 +20,15 @@
 <body>
 
 <!-- Docs -->
-<?php if ($options['github_repo']): ?>
-<a href="https://github.com/<?=$options['github_repo']?>" target="_blank" id="github-ribbon" class="hidden-print">
+<?php if ($options['github_repo_name']): ?>
+<a href="https://github.com/<?=$options['github_repo_name']?>" target="_blank" id="github-ribbon" class="hidden-print">
     <img src="<?=$assets_url?>/img/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
 </a>
 <?php endif; ?>
 <div class="navbar navbar-fixed-top hidden-print">
     <div class="container-fluid">
-        <a class="brand navbar-brand pull-left" href="<?=$urlpre?>"><?=$options['title']?></a>
-        <p class="navbar-text pull-right"> <?php echo \Docx\Common::randGreeting($options['greetings']); ?> </p>
+        <a class="brand navbar-brand pull-left" href="<?=$urlpre . 'index' . $urlext?>"><?=$options['title']?></a>
+        <p class="navbar-text pull-right"> <?php echo hp_rand_greeting($options['greetings']); ?> </p>
     </div>
 </div>
 

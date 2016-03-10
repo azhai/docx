@@ -7,7 +7,6 @@ defined('APP_ROOT') or define('APP_ROOT', __DIR__);
 defined('VENDOR_DIR') or define('VENDOR_DIR', APP_ROOT . '/vendor');
 
 $settings = array(
-    'urlpre' => '/docx/index.php',          #首页URL
     'source_dir' => 'source',               #原始文档目录
     'public_dir' => 'public',               #静态输出目录
     'assets_dir' => 'assets',               #资源目录
@@ -25,12 +24,13 @@ $settings = array(
     'cache_dir' => 'temp',                  #缓存目录
     'cache_ext' => '.yml',
     'blog_sorting' => array('/PHP'),
-    #（可写）HTML仓库分支名称
-    'publish_branch' => 'coding-pages',
-    #（可写）HTML仓库完整url
-    'publish_repo' => 'https://azhai:x1378742@git.coding.net/azhai/azhai.git',
-    #github仓库url
-    'github_repo' => 'azhai/docx',
+    #pages仓库
+    'repo_url' => 'https://git.coding.net/azhai/azhai.git',
+    'repo_user' => 'azhai',
+    'repo_pass' => 'x1378742',
+    'repo_branch' => 'coding-pages',
+    #github仓库名称
+    'github_repo_name' => 'azhai/docx',
     'google_analytics' => false,
     'links' => array(
         'Coding仓库' => 'https://coding.net/u/azhai/p/docx/git',
@@ -53,22 +53,31 @@ $settings = array(
 );
 
 
-$package = VENDOR_DIR . '/docx.lite.php';
-if (is_readable($package)) { // 使用压缩后的文件
-    require_once $package;
+$package_file = VENDOR_DIR . '/docx.lite.php';
+if (is_readable($package_file)) { // 使用压缩后的文件
+    require_once $package_file;
 } else {
     require_once VENDOR_DIR . '/Docx/Importer.php';
 }
 
 $app = new \Docx\Application($settings);
-$app->import('TQ', VENDOR_DIR . '/PHP-Stream-Wrapper-for-Git-1.0.1/src');
-$app->addClass(VENDOR_DIR . '/Parsedown.php', 'Parsedown');
 
 
 require_once APP_ROOT . '/handlers.php';
+require_once APP_ROOT . '/helpers.php';
 $app->route('/<path>', 'Viewhandler');
 $app->route('/admin/<path>', 'EditHandler');
 $app->route('/admin/staticize/', 'HtmlHandler');
 $app->route('/admin/publish/', 'RepoHandler');
+$app->route('/admin/compress/', function() use($app, $package_file) {
+    $app->addClass(VENDOR_DIR . '/Compressor.php', 'Compressor');
+    $cps = new \Compressor();
+    $cps->minify($package_file,
+                glob(VENDOR_DIR . '/Docx/*.php'),
+                glob(VENDOR_DIR . '/Docx/Base/*.php'),
+                glob(VENDOR_DIR . '/Docx/Event/*.php'),
+                glob(VENDOR_DIR . '/Docx/*/*.php'));
+    return "DONE.\n";
+});
 $app->run();
 ?>

@@ -1,15 +1,15 @@
 <?php
 $show_menu = function($node, $menu_url, $children = [])
-                use($curr_url, $relate_url, $urlext)
+                use($curr_url, $urlpre, $urlext)
 {
     $menu_url = trim($menu_url, '/');
     $curr_url = trim($curr_url, '/');
-    $is_match = \Docx\Common::startsWith($curr_url, $menu_url);
+    $is_match = hp_starts_with($curr_url, $menu_url);
     if ($node['is_file']) {
         $li_class = $is_match ? ' class="active"' : '';
         return <<<EOD
 <li{$li_class}>
-<a href="{$relate_url}{$menu_url}{$urlext}">{$node['title']}</a>
+<a href="{$urlpre}{$menu_url}{$urlext}">{$node['title']}</a>
 </li>
 EOD;
     } else if (isset($node['nodes'])) {
@@ -44,8 +44,8 @@ $menus = \Docx\Utility\FileSystem::traverse($organiz['nodes'], $show_menu, '');
         <div><a href="#" id="toggleCodeBlockBtn" onclick="toggleCodeBlocks();">外置代码框</a></div>
         <?php
         if ($page_type !== 'html'):
-            echo '<div><a href="' . $urlpre . '/admin/staticize/">生成静态页</a></div>';
-            echo '<div><a href="' . $urlpre . '/admin/publish/">Git发布</a></div>';
+            echo '<div><a href="' . $urlpre . 'admin/staticize/">生成静态页</a></div>';
+            echo '<div><a href="' . $urlpre . 'admin/publish/">Git发布</a></div>';
         endif;
         ?>
     </div>

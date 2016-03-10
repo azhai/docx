@@ -30,6 +30,14 @@ class Word
     {
         $this->content = $content;
     }
+    
+    /**
+     * 改写成适合的网址
+     */
+    public static function slugify($name)
+    {
+        return strtolower(str_replace(' ', '-', $name));
+    }
 
     /**
      * 数字转为中文.

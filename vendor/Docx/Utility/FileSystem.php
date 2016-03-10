@@ -9,6 +9,7 @@
 namespace Docx\Utility;
 
 use Docx\Common;
+use Docx\Utility\Word;
 use Docx\Utility\Markdoc;
 
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
@@ -130,7 +131,7 @@ class FileSystem
         if (count($pieces) === 2 && is_numeric($pieces[0])) {
             $filename = $pieces[1];
         }
-        $slugname = Common::slugify($filename);
+        $slugname = Word::slugify($filename);
         return array($slugname, $filename);
     }
     
