@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>       <html class="no-js ie6 oldie" lang="zh"> <![endif]-->
+<!--[if IE 7]>          <html class="no-js ie7 oldie" lang="zh"> <![endif]-->
+<!--[if IE 8]>          <html class="no-js ie8 oldie" lang="zh"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="zh">
+<!--<![endif]-->
+<head>
+<title>安装Linux开发环境之四 —— Redis - docx文档生成工具</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="最简单的方式构建你的项目文档" />
+<meta name="author" content="Ryan Liu">
+<link rel="icon" href="../assets/img/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="../assets/css/style.min.css">
+<style rel="stylesheet">h1 a.html-hidden, div a.html-hidden</style>
+<!-- Mobile -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<!-- Docs -->
+<a href="https://github.com/azhai/docx" target="_blank" id="github-ribbon" class="hidden-print">
+    <img src="../assets/img/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+</a>
+<div class="navbar navbar-fixed-top hidden-print">
+    <div class="container-fluid">
+        <a class="brand navbar-brand pull-left" href="/docx/index.php">docx文档生成工具</a>
+        <p class="navbar-text pull-right"> 使用PHP框架 – Josh Sharp </p>
+    </div>
+</div>
+
+<div class="container-fluid fluid-height wrapper">
+    <div class="row columns content">
+        <div class="left-column article-tree col-sm-3 hidden-print">
+        <!-- For Mobile -->
+<div class="responsive-collapse">
+    <button type="button" class="btn btn-sidebar" id="menu-spinner-button">
+    <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+    </button>
+</div>
+<div id="sub-nav-collapse" class="sub-nav-collapse">
+    <!-- Navigation -->
+    <ul class="nav nav-list">
+    <li>
+<a href="../index.html">首页</a>
+</li>
+<li>
+<a href="#" class="aj-nav folder">Deploy</a>
+<ul class="nav nav-list">
+<li>
+<a href="../deploy/vim_config.html">VIM配置</a>
+</li>
+<li>
+<a href="../deploy/nginx_case_insensitive.html">让Nginx对URL不区分大小写</a>
+</li>
+<li>
+<a href="../deploy/rsync_config.html">Rsync配置与使用</a>
+</li>
+<li>
+<a href="../deploy/install_postfix.html">安装Postfix邮件服务器</a>
+</li>
+<li>
+<a href="../deploy/nginx_log_cookie.html">Nginx记录访问cookie到日志</a>
+</li>
+<li>
+<a href="../deploy/linux_upstart.html">Linux新的守护进程方式upstart</a>
+</li>
+<li>
+<a href="../deploy/nginx-http_base_auth.html">Nginx设置简单HTTP认证</a>
+</li>
+<li>
+<a href="../deploy/nginx_logrotate.html">Nginx日志按日期切割</a>
+</li>
+<li>
+<a href="../deploy/samba_conf.html">Samba简单配置</a>
+</li>
+</ul>
+</li>
+<li class="open">
+<a href="#" class="aj-nav folder">CentOS</a>
+<ul class="nav nav-list">
+<li>
+<a href="../centos/centos_install_mysql.html">安装Linux开发环境之一 —— MySQL</a>
+</li>
+<li>
+<a href="../centos/centos_install_php.html">安装Linux开发环境之二 —— PHP</a>
+</li>
+<li>
+<a href="../centos/centos_install_nginx.html">安装Linux开发环境之三 —— Nginx</a>
+</li>
+<li class="active">
+<a href="../centos/centos_install_redis.html">安装Linux开发环境之四 —— Redis</a>
+</li>
+<li>
+<a href="../centos/centos_install_leveldb_beanstalkd.html">安装Linux开发环境之五 —— LevelDB、Beanstalkd</a>
+</li>
+<li>
+<a href="../centos/centos_install_lamp.html">在CentOS上部署lamp环境</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">PHP</a>
+<ul class="nav nav-list">
+<li>
+<a href="../php/zf2-multiple_dbs.html">Zend Framework 2 配置多个数据库</a>
+</li>
+<li>
+<a href="../php/weight_rrd.html">PHP权重轮询</a>
+</li>
+<li>
+<a href="../php/phpunit_boot.html">启动PHPUnit测试的简便方式</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">Python</a>
+<ul class="nav nav-list">
+<li>
+<a href="../python/python_pop3.html">通过POP3协议读取指定邮件</a>
+</li>
+<li>
+<a href="../python/python_pinyin.html">GB2312中文转拼音</a>
+</li>
+<li>
+<a href="../python/python_md5.html">Python计算文件的MD5</a>
+</li>
+<li>
+<a href="../python/python_mulpti_logging.html">Python多进程记录日志</a>
+</li>
+<li>
+<a href="../python/python_paginate.html">一个Python分页</a>
+</li>
+<li>
+<a href="../python/python_urlib.html">Python网址操作函数</a>
+</li>
+<li>
+<a href="../python/python_pymssql_re2.html">安装Python支持SqlServer和re2</a>
+</li>
+<li>
+<a href="../python/python_functions.html">收集用过的一些Python方法</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">Tool</a>
+<ul class="nav nav-list">
+<li>
+<a href="../tool/git_push.html">正确使用git避免提交冲突</a>
+</li>
+<li>
+<a href="../tool/haskell_mysql_dumper.html">MySQL导出CSV文件（Haskell实现）</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">Help</a>
+<ul class="nav nav-list">
+<li>
+<a href="../help/github-flavored-markdown.html">Markdown 语法</a>
+</li>
+</ul>
+</li>    </ul>
+    <div class="well well-sidebar">
+        <div><a href="#" id="toggleCodeBlockBtn" onclick="toggleCodeBlocks();">外置代码框</a></div>
+            </div>
+    <div class="well well-sidebar">
+        <!-- Links -->
+        <div><a href="https://coding.net/u/azhai/p/docx/git" target="_blank">Coding仓库</a></div><div><a href="http://git.oschina.net/azhai/docx" target="_blank">OSChina仓库</a></div><div><a href="http://todaymade.com" target="_blank">Todaymade出品Daux.io</a></div><div><a href="http://blog.emx2.co.uk" target="_blank">Xin Meng翻译文档</a></div>    </div>
+</div>        </div>
+
+        <div class="right-column content-area col-sm-9">
+            <div class="content-page">
+                <article>
+                    <div class="page-header sub-header clearfix">
+                        <h1>安装Linux开发环境之四 —— Redis
+</h1>
+                        <span style="float: left; font-size: 10px; color: gray;">
+                        标签：linux, redis                        </span>
+                        <span style="float: right; font-size: 10px; color: gray;">
+                        <!--a href="/docx/index.phpauthor/ryan-liu"-->
+                        Ryan Liu<!--/a--> 写于 2013年2月20日 星期三                        </span>
+                    </div>
+
+                    <h2>安装Redis</h2>
+<p>下载 <a href="http://redis.googlecode.com/files/redis-2.6.12.tar.gz">redis-2.6.12</a> 解压并进入目录</p>
+<pre><code class="language-bash">wget http://redis.googlecode.com/files/redis-2.6.12.tar.gz
+tar xzf redis-2.6.12.tar.gz
+cd redis-2.6.12
+make
+#make test 在v2.6.12版本root用户下存在bug
+if [ `whoami` != "root" ]
+    make test
+fi
+make PREFIX=/opt/redis-2.6.12 install
+cd ..</code></pre>
+<h2>启动Redis</h2>
+<pre><code class="language-bash">#复制配置
+mkdir /opt/redis-2.6.12/etc/
+cp redis-2.6.12/redis.conf /opt/redis-2.6.12/etc/
+cp redis-2.6.12/sentinel.conf /opt/redis-2.6.12/etc/
+#修改配置
+sed -i '/^daemonize/c#daemonize no\ndaemonize yes' /opt/redis-2.6.12/etc/redis.conf
+sed -i '/^loglevel notice/c#loglevel notice\nloglevel warning' /opt/redis-2.6.12/etc/redis.conf
+sed -i '/^logfile stdout/c#logfile stdout\nlogfile /var/log/redis.log' /opt/redis-2.6.12/etc/redis.conf
+#建立软连接
+ln -s /opt/redis-2.6.12/bin/redis-server /usr/bin/redis-server
+ln -s /opt/redis-2.6.12/bin/redis-cli /usr/bin/redis-cli
+#启动
+redis-server /opt/redis-2.6.12/etc/redis.conf</code></pre>
+<h2>安装phpredis</h2>
+<p>下载 <a href="https://github.com/nicolasff/phpredis/archive/2.2.2.tar.gz">phpredis-2.2.2.tar.gz</a> ，重命名为 phpredis-2.2.2.tar.gz，解压并进入目录</p>
+<pre><code class="language-bash">wget https://github.com/nicolasff/phpredis/archive/2.2.2.tar.gz \
+mv 2.2.2.tar.gz phpredis-2.2.2.tar.gz \
+tar xzf phpredis-2.2.2.tar.gz \
+cd phpredis-2.2.2 \
+phpize \
+./configure \
+make &amp;&amp; make install \
+cd .. \
+#添加到php.ini
+sed -i '1a\extension=redis.so' /etc/php5/fpm/php.ini
+
+ps -efww | grep php-fpm | grep -v grep | cut -c 9-15 | xargs kill -9
+php-fpm -c /etc/php5/fpm/php.ini -y /etc/php5/fpm/php-fpm.conf -D</code></pre>                </article>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="../assets/js/jquery.min.js"></script> 
+<script src="../assets/js/custom.js"></script> 
+<!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<!-- hightlight.js -->
+<script src="../assets/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>

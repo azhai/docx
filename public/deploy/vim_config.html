@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>       <html class="no-js ie6 oldie" lang="zh"> <![endif]-->
+<!--[if IE 7]>          <html class="no-js ie7 oldie" lang="zh"> <![endif]-->
+<!--[if IE 8]>          <html class="no-js ie8 oldie" lang="zh"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="zh">
+<!--<![endif]-->
+<head>
+<title>VIM配置 - docx文档生成工具</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="最简单的方式构建你的项目文档" />
+<meta name="author" content="Ryan Liu">
+<link rel="icon" href="../assets/img/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="../assets/css/style.min.css">
+<style rel="stylesheet">h1 a.html-hidden, div a.html-hidden</style>
+<!-- Mobile -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<!-- Docs -->
+<a href="https://github.com/azhai/docx" target="_blank" id="github-ribbon" class="hidden-print">
+    <img src="../assets/img/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+</a>
+<div class="navbar navbar-fixed-top hidden-print">
+    <div class="container-fluid">
+        <a class="brand navbar-brand pull-left" href="/docx/index.php">docx文档生成工具</a>
+        <p class="navbar-text pull-right"> 使用批处理 – Jack D. Herrington </p>
+    </div>
+</div>
+
+<div class="container-fluid fluid-height wrapper">
+    <div class="row columns content">
+        <div class="left-column article-tree col-sm-3 hidden-print">
+        <!-- For Mobile -->
+<div class="responsive-collapse">
+    <button type="button" class="btn btn-sidebar" id="menu-spinner-button">
+    <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+    </button>
+</div>
+<div id="sub-nav-collapse" class="sub-nav-collapse">
+    <!-- Navigation -->
+    <ul class="nav nav-list">
+    <li>
+<a href="../index.html">首页</a>
+</li>
+<li class="open">
+<a href="#" class="aj-nav folder">Deploy</a>
+<ul class="nav nav-list">
+<li class="active">
+<a href="../deploy/vim_config.html">VIM配置</a>
+</li>
+<li>
+<a href="../deploy/nginx_case_insensitive.html">让Nginx对URL不区分大小写</a>
+</li>
+<li>
+<a href="../deploy/rsync_config.html">Rsync配置与使用</a>
+</li>
+<li>
+<a href="../deploy/install_postfix.html">安装Postfix邮件服务器</a>
+</li>
+<li>
+<a href="../deploy/nginx_log_cookie.html">Nginx记录访问cookie到日志</a>
+</li>
+<li>
+<a href="../deploy/linux_upstart.html">Linux新的守护进程方式upstart</a>
+</li>
+<li>
+<a href="../deploy/nginx-http_base_auth.html">Nginx设置简单HTTP认证</a>
+</li>
+<li>
+<a href="../deploy/nginx_logrotate.html">Nginx日志按日期切割</a>
+</li>
+<li>
+<a href="../deploy/samba_conf.html">Samba简单配置</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">CentOS</a>
+<ul class="nav nav-list">
+<li>
+<a href="../centos/centos_install_mysql.html">安装Linux开发环境之一 —— MySQL</a>
+</li>
+<li>
+<a href="../centos/centos_install_php.html">安装Linux开发环境之二 —— PHP</a>
+</li>
+<li>
+<a href="../centos/centos_install_nginx.html">安装Linux开发环境之三 —— Nginx</a>
+</li>
+<li>
+<a href="../centos/centos_install_redis.html">安装Linux开发环境之四 —— Redis</a>
+</li>
+<li>
+<a href="../centos/centos_install_leveldb_beanstalkd.html">安装Linux开发环境之五 —— LevelDB、Beanstalkd</a>
+</li>
+<li>
+<a href="../centos/centos_install_lamp.html">在CentOS上部署lamp环境</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">PHP</a>
+<ul class="nav nav-list">
+<li>
+<a href="../php/zf2-multiple_dbs.html">Zend Framework 2 配置多个数据库</a>
+</li>
+<li>
+<a href="../php/weight_rrd.html">PHP权重轮询</a>
+</li>
+<li>
+<a href="../php/phpunit_boot.html">启动PHPUnit测试的简便方式</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">Python</a>
+<ul class="nav nav-list">
+<li>
+<a href="../python/python_pop3.html">通过POP3协议读取指定邮件</a>
+</li>
+<li>
+<a href="../python/python_pinyin.html">GB2312中文转拼音</a>
+</li>
+<li>
+<a href="../python/python_md5.html">Python计算文件的MD5</a>
+</li>
+<li>
+<a href="../python/python_mulpti_logging.html">Python多进程记录日志</a>
+</li>
+<li>
+<a href="../python/python_paginate.html">一个Python分页</a>
+</li>
+<li>
+<a href="../python/python_urlib.html">Python网址操作函数</a>
+</li>
+<li>
+<a href="../python/python_pymssql_re2.html">安装Python支持SqlServer和re2</a>
+</li>
+<li>
+<a href="../python/python_functions.html">收集用过的一些Python方法</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">Tool</a>
+<ul class="nav nav-list">
+<li>
+<a href="../tool/git_push.html">正确使用git避免提交冲突</a>
+</li>
+<li>
+<a href="../tool/haskell_mysql_dumper.html">MySQL导出CSV文件（Haskell实现）</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#" class="aj-nav folder">Help</a>
+<ul class="nav nav-list">
+<li>
+<a href="../help/github-flavored-markdown.html">Markdown 语法</a>
+</li>
+</ul>
+</li>    </ul>
+    <div class="well well-sidebar">
+        <div><a href="#" id="toggleCodeBlockBtn" onclick="toggleCodeBlocks();">外置代码框</a></div>
+            </div>
+    <div class="well well-sidebar">
+        <!-- Links -->
+        <div><a href="https://coding.net/u/azhai/p/docx/git" target="_blank">Coding仓库</a></div><div><a href="http://git.oschina.net/azhai/docx" target="_blank">OSChina仓库</a></div><div><a href="http://todaymade.com" target="_blank">Todaymade出品Daux.io</a></div><div><a href="http://blog.emx2.co.uk" target="_blank">Xin Meng翻译文档</a></div>    </div>
+</div>        </div>
+
+        <div class="right-column content-area col-sm-9">
+            <div class="content-page">
+                <article>
+                    <div class="page-header sub-header clearfix">
+                        <h1>VIM配置
+</h1>
+                        <span style="float: left; font-size: 10px; color: gray;">
+                        标签：vim                        </span>
+                        <span style="float: right; font-size: 10px; color: gray;">
+                        <!--a href="/docx/index.phpauthor/ryan-liu"-->
+                        Ryan Liu<!--/a--> 写于 2013年4月11日 星期四                        </span>
+                    </div>
+
+                    <h2>vim配置文件 ~/.vimrc</h2>
+<pre><code class="language-vim">" 设定配色方案
+" colorscheme molokai
+" 显示行号
+set nu
+" 突出显示当前行
+" set cursorline
+" 用浅色高亮当前行
+autocmd InsertEnter * se cul
+" 自动语法高亮
+syntax on
+" 覆盖文件时不备份
+set nobackup
+" 自动切换当前目录为当前文件所在的目录
+" set autochdir
+" 去掉输入错误的提示声音
+set noeb
+
+"代码补全
+set completeopt=preview,menu
+"允许插件
+filetype plugin on
+"共享剪贴板
+set clipboard+=unnamed
+
+" 文件编码
+set fencs=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936
+set termencoding=utf-8
+set encoding=utf-8
+set fileencodings=ucs-bom,utf-8,cp936
+set fileencoding=utf-8
+
+" 设定 tab 长度为 4
+set tabstop=4
+" 设置按BackSpace的时候可以一次删除掉4个空格
+set softtabstop=4
+" 设定 &lt;&lt; 和 &gt;&gt; 命令移动时的宽度为 4
+set shiftwidth=4
+set smarttab
+" 智能自动缩进
+set smartindent
+" 显示空格和制表符
+set listchars=tab:&gt;-,trail:-
+set list
+
+" 不自动换行
+"set nowrap
+" 解决自动换行格式下, 如高度在折行之后超过窗口高度结果这一行看不到的问题
+set display=lastline
+</code></pre>
+<h2>常用操作</h2>
+<p>参考</p>
+<p><a href="http://arhat.blog.51cto.com/101503/114148]">毛渊的窝: vim(vi)常用操作及记忆方法</a></p>
+<p><a href="http://www.cnblogs.com/moodlxs/archive/2012/03/24/2415526.html">绿色冰点: VIM常用操作, 插件和vimrc文件</a></p>
+<p>VI的三种模式
+1，命令模式   2，输入模式   3，末行模式</p>
+<p>命令         执行的操作                 记忆方法
+:q             退出                     quit
+:w             存盘                     write
+:e             打开新文件
+:r             读取文件到VI             read
+:!             强行
+:set nu        显示行号                 number
+:set nonu      隐藏行号                 no number</p>
+<p>h     j     k     l
+左    下    上    右</p>
+<p>Ctrl + f       翻到下一页（向前翻页）     front
+Ctrl + b       翻到上一页（向后翻页）     back
+Ctrl + u       向前翻半页
+Ctrl + d       向后翻半页</p>
+<p>^              移到行头          往上就到行头了（象形）
+$              移到行尾          写完一行就要给一行的钱
+w              下一个单词        word
+b              前一个单词        behind（在。。。后面）
+e              下一单词尾        end</p>
+<h1>G             跳到某一行        大哥(G)说到哪就到哪</h1>
+<p>i              光标前插入        insert
+a              光标后加入        add
+A              在行末加入        在一个词后是小a,一个行后就是大A
+o              另起一行加入      一个小鸡蛋（小o）掉下来了摔开了花
+O              上一行加入        吐一个大泡泡（大O）飞上去破了</p>
+<p>－－－－－－－－－－ c（吃掉）代表行内删除－－－－－－－－
+cw       删除一个单词（一部分不包括空格）  吃掉一个 word
+c$       删除一行到行尾                    刚写的一行被删了，钱也拿不到了
+c^       删除一行到行头                    往上吃，一直吃到头
+x        删除一个字符                      看你不爽就打上“x”</p>
+<p>－－－－－－－－－－ d 代表删除－－－－－－－－－－－－－－
+dd       删除一行                           del dir
+dw       删除单词到尾部（包括空格）         del word
+de       删除单词到尾部（不包括尾部空格）   del end
+d$       删除当前到行尾的所有字符           del $(代表尾部)
+d^       删除当前到行首的所有字符           del ^(代表行首)</p>
+<p>J       合并当前行                   一个大钩子(J)把下面的一行拉到自己行尾
+u       撤销上次操作                 undo
+U       撤销当前行所有操作           事情闹大了，得有个更大的UNDO才能恢复
+Ctrl + r    恢复undo 前              recover</p>
+<p>－－－－－－－－－ y 代表复制到缓存中－－－－－－－－－－－
+yy           复制当前行整行的内容到vi缓冲区
+yw           复制当前光标到单词尾字符的内容到vi缓冲区
+y$           复制当前光标到行尾的内容到vi缓冲区
+y^           复制当前光标到行首的内容到vi缓冲区
+p            读取vi缓冲区中的内容，并粘贴到光标当前的位置（不覆盖文件已有的内容）</p>
+<p>/word       从上而下查              /是从上而下写的吧
+?word       从下而上查找            字符在哪儿呢（？）回头找找吧
+n           定位下一个匹配的        相当于向下查找下一个 next
+N           定位上一个匹配的        相当于向上查找上一个</p>
+<p>:s/1/2          搜索当前行第一个1并用2代替      search
+:s/1/2/g        搜索当前行所有的1并用2代替      global
+:#,#s/1/2/g     在#,#间搜索所有1并用2替换
+:%s/1/2/g       在整个文档中将1替换为2          100％（全部）
+:s/1/2/c        每次替换都给出提示确认          cue提示</p>
+<p>vim 1.txt 2.txt 3.txt  同时打开多个文档
+:args             显示多文件信息(会在末行提示当前打开了哪些档)     are globals
+:next             切换到下一个文件
+:prev             切换到上一个文件
+:first            定位首文件
+:last             定位尾文件
+Ctrl + ^          快速切换到编辑器中切换前的文件</p>                </article>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="../assets/js/jquery.min.js"></script> 
+<script src="../assets/js/custom.js"></script> 
+<!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<!-- hightlight.js -->
+<script src="../assets/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
