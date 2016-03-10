@@ -22,12 +22,12 @@ $settings = array(
     #相对路径，自动加上APP_ROOT前缀
     'theme_dir' => 'theme',                 #主题模板目录
     'cache_dir' => 'temp',                  #缓存目录
-    'cache_ext' => '.yml',
+    'cache_ext' => '.json',
     'blog_sorting' => array('/PHP'),
     #pages仓库
     'repo_url' => 'https://git.coding.net/azhai/azhai.git',
     'repo_user' => 'azhai',
-    'repo_pass' => 'x1378742',
+    'repo_pass' => 'xxxxxx',
     'repo_branch' => 'coding-pages',
     #github仓库名称
     'github_repo_name' => 'azhai/docx',

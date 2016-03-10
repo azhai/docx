@@ -267,8 +267,8 @@ class RepoHandler extends Handler
 
     public function finish()
     {
-        $home_url = $this->globals['urlpre'];
-        return Response::redirect($home_url);
+        $home_url = '../../' . $this->globals['urlpre'];
+        return Response::redirect($home_url . 'index/');
     }
     
     public function getAction()
@@ -277,9 +277,10 @@ class RepoHandler extends Handler
         $comment = $request->getPost('comment', 'Nothing');
         $settings = $this->app->settings;
         $branch = $settings['repo_branch'];
+        $this->repo->checkout('-b', $branch);
+        $this->repo->pull();
         $this->repo->add();
         $this->repo->commitMutely($comment);
-        $this->repo->checkout('-b', $branch);
         $this->repo->push('origin', $branch, '--tags');
     }
 }

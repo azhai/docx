@@ -6,9 +6,8 @@
 ## 快速使用 （docx添加）
 
 * 下载最新的项目代码 [docx](https://github.com/azhai/docx/archive/master.zip)，解压后在命令行下进入目录docx
-* 如果操作系统是Linux/BSD/MacOS，设置index.php为可执行 chmod +x index.php
-* 将web服务器的文档目录设置为docx，打开浏览器查看网站，同时会生成静态页在static目录
-* 修改配置 docs/config.json，编辑docs目录*.md文档，重新生成静态文件
+* 将web服务器的文档目录设置为public/source，打开浏览器查看网站，同时会生成静态页在public目录
+* 修改配置 index.php，编辑public/source目录*.md文档，重新生成静态文件
 
 ### Windows下安装使用
 
@@ -39,6 +38,17 @@
     git commit -a -m '第一次生成静态博客'
     git push -u origin gitcafe-pages
     ```
+
+### 2015-3-10 全部重写代码，去掉生成PDF
+
+* nginx部署时，请去掉将location中的\.php$改为\.php或者\.php(/|$)，并去掉try_files
+
+* 保证temp和public两个目录可写
+
+* php本身不带yaml扩展，请将配置中的cache_ext由.yml改为.json
+
+* 如果docx目录有.git目录，无法在docx/public下再生成.git
+
 
 ### 2014-10-16 Refactor
 
