@@ -62,9 +62,6 @@ if (is_readable($package)) { // 使用压缩后的文件
 
 $app = new \Docx\Application($settings);
 $app->import('TQ', VENDOR_DIR . '/PHP-Stream-Wrapper-for-Git-1.0.1/src');
-//$app->introduce('Symfony\\Component\\Process', VENDOR_DIR . '/process-3.0.3');
-//$app->import('Gitter', VENDOR_DIR . '/gitter/lib');
-//$app->addClass(VENDOR_DIR . '/Git.php', 'Git');
 $app->addClass(VENDOR_DIR . '/Parsedown.php', 'Parsedown');
 
 

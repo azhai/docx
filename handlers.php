@@ -5,6 +5,7 @@ use Docx\Cache;
 use Docx\Web\Response;
 use Docx\Utility\FileSystem;
 use Docx\Utility\Markdoc;
+use Docx\Utility\Repository;
 
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 
@@ -249,58 +250,21 @@ class RepoHandler extends Viewhandler
         $comment = $this->app->request->getPost('comment', 'Nothing');
         $public_dir = APP_ROOT . DS . $this->app->settings['public_dir'];
         $branch = $this->app->settings['publish_branch'];
-        
-        $is_exists = is_dir($public_dir . DS . '.git');
-        $repo = \TQ\Git\Repository\Repository::open($public_dir, 'git', true);
-        $repo->add();
-        $repo->commit($comment);
-        if (!$is_exists) {
-            $remote = $this->app->settings['publish_repo'];
-            $repo->getGit()->remote($public_dir, 'add origin ' . $remote);
-        }
-        exit;
-        
-        /*
-        $client = new Gitter\Client();
         if (!is_dir($public_dir . DS . '.git')) {
-            $repo = $client->createRepository($public_dir);
             $remote = $this->app->settings['publish_repo'];
-            $client->run($repo, 'remote add origin ' . $remote);
+            $repo = Repository::create($public_dir, $remote);
         } else {
-            $repo = $client->getRepository($public_dir);
+            $repo = Repository::open($public_dir);
         }
+        
         $repo->add();
-        exit;
+        $repo->commitMutely($comment);
+        $repo->checkout('-b', $branch);
         try {
-            $repo->commit($comment);
+            $repo->push('origin', $branch, '--tags');
         } catch (\Exception $e) {
             echo strval($e);
         }
-        */
-        
-        /*
-        if (Common::isWinNT()) {
-            \Git::windows_mode();
-        }
-        if (!is_dir($public_dir . DS . '.git')) {
-            $remote = $this->app->settings['publish_repo'];
-            $repo = \Git::create($public_dir);
-            $repo->run('remote add origin ' . $remote);
-        } else {
-            $repo = \Git::open($public_dir);
-        }
-        //$this->addFiles($repo);
-        $repo->add();
-        var_dump($repo->status());
-        exit;
-        try {
-            $repo->commit($comment);
-        } catch (\Exception $e) {
-            echo strval($e);
-        }
-        exit;
-        $repo->push('origin', $branch);
-        */
         $this->finish();
         return $this;
     }
@@ -308,10 +272,6 @@ class RepoHandler extends Viewhandler
     public function finish()
     {
         $home_url = $this->app->settings['urlpre'];
-        if (Common::endsWith($home_url, '/index.php')) {
-            $home_url = substr($home_url, 0, - strlen('/index.php'));
-        }
-        $dir = $this->app->settings['public_dir'];
-        return Response::redirect($home_url . '/' . $dir . '/index.html');
+        return Response::redirect($home_url);
     }
 }
