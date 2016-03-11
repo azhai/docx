@@ -19,6 +19,7 @@ use Docx\Common;
  */
 class Request
 {
+    const PHP_INDEX_FILE = 'index.php';
 
     /**
      * getValue()或getInput()的简写形式
@@ -192,12 +193,20 @@ class Request
         $url = self::getInput('SERVER', 'REQUEST_URI');
         $url = parse_url($url, PHP_URL_PATH);
         $name = self::getInput('SERVER', 'SCRIPT_NAME');
-        if (empty($url) || $url . 'index.php' === $name) {
-            $path = '';
-        } else if (Common::startsWith($url, $name)) {
-            $path = substr($url, strlen($name));
+        if (empty($url) || $url === $name) {
+            return '';
         }
-        return rtrim($path, '/ ') . '/';
+        
+        $path = rtrim($url, '/ ') . '/';
+        $head = substr($name, 0, - strlen(self::PHP_INDEX_FILE));
+        if ($path . self::PHP_INDEX_FILE === $name) {
+            $path = '/';
+        } else if (Common::startsWith($path, $name)) {
+            $path = substr($path, strlen($name));
+        } else if (Common::startsWith($path, $head)) {
+            $path = substr($path, strlen($head) - 1);
+        }
+        return $path;
     }
 
     /**

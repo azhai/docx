@@ -27,6 +27,7 @@ class Application
         'session' => '\\Docx\\Web\\SessionHandler',
     ];
     protected $shortcuts = []; // 快捷方式
+    public $route_key = '';
     public $settings = []; // 配置
 
     /**
@@ -51,6 +52,7 @@ class Application
         $this->installRef($importer, ['import', 'introduce', 'addClass']);
         $root = Router::getCurrent(); //根路由
         $this->installRef($root, ['dispatch', 'expose']);
+        $this->route_key = isset($settings['route_key']) ? $settings['route_key'] : '';
         $this->settings = $settings;
     }
 
@@ -129,25 +131,16 @@ class Application
         $args = func_get_args();
         return Common::execMethodArray($router, 'route', $args);
     }
-
+    
     /**
-     * 获取当前网址对应handlers
+     * 执行对应handlers
      */
-    public function run($path = false)
+    public function execute($path, $method)
     {
-        if ($path === false) {
-            if (Common::isCLI()) {
-                $argv = $this->request->getArgv();
-                $path = '/' . implode('/', array_slice($argv, 1));
-            } else {
-                $path = $this->request->getPath();
-            }
-        }
         $route = $this->dispatch($path);
         if (!$route) {
             return die();
         }
-        
         $backend = null;
         foreach ($route['handlers'] as $handler) {
             if (empty($handler)) {
@@ -157,11 +150,6 @@ class Application
                 $handler = new $handler($this, $backend);
             }
             $backend = $handler;
-        }
-        
-        $method = $this->request->getMethod();
-        if ($method === 'post') {
-            $method = $this->request->getString('_method', 'post');
         }
         if (!($handler instanceof \Closure)) {
             $handler->globals['method'] = $method;
@@ -181,5 +169,24 @@ class Application
             }
         }
         return die(strval($output));
+    }
+
+    /**
+     * 运行CGI/CLI程序
+     */
+    public function run()
+    {
+        if (Common::isCLI()) {
+            $argv = $this->request->getArgv();
+            $path = '/' . implode('/', array_slice($argv, 1));
+            $method = 'exec';
+        } else {
+            $path = $this->request->getPath($this->route_key);
+            $method = $this->request->getMethod();
+            if ($method === 'post') {
+                $method = $this->request->getString('_method', 'post');
+            }
+        }
+        return $this->execute($path, $method);
     }
 }

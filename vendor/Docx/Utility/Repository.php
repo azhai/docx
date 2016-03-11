@@ -45,10 +45,9 @@ class Repository extends GitRepository
     }
     
     public static function create($repositoryPath, $remotePath,
-            $git = null, $initArguments = null, $findRepositoryRoot = true)
+            $git = null, $initArguments = null)
     {
-        $repo = self::open($repositoryPath, $git, true,
-                            $initArguments, $findRepositoryRoot);
+        $repo = self::open($repositoryPath, $git, true, $initArguments, false);
         $repo->remote('add', 'origin', $remotePath);
         return $repo;
     }

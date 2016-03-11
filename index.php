@@ -7,23 +7,23 @@ defined('APP_ROOT') or define('APP_ROOT', __DIR__);
 defined('VENDOR_DIR') or define('VENDOR_DIR', APP_ROOT . '/vendor');
 
 $settings = array(
-    'source_dir' => 'source',               #原始文档目录
+    'route_key' => 'r',
     'public_dir' => 'public',               #静态输出目录
+    'archives_dir' => 'archives',           #原始文档目录
     'assets_dir' => 'assets',               #资源目录
     'title' => 'docx文档生成工具',
     'tagline' => '最简单的方式构建你的项目文档',
     'reading' => '开始阅读文档',
     'cover_image' => 'img/cover.png',
     'author' => 'Ryan Liu',
-    'timezone' => 'Asia/Shanghai',
-    'date_format' => 'Y年n月j日 星期w',
-    'memory_limit' => '256M',
     'layout' => 'post',                     #默认模板布局
+    'date_format' => 'Y年n月j日 星期w',
+    'timezone' => 'Asia/Shanghai',
+    'memory_limit' => '256M',
     #相对路径，自动加上APP_ROOT前缀
     'theme_dir' => 'theme',                 #主题模板目录
     'cache_dir' => 'temp',                  #缓存目录
     'cache_ext' => '.json',
-    'blog_sorting' => array('/PHP'),
     #pages仓库
     'repo_url' => 'https://git.coding.net/azhai/azhai.git',
     'repo_user' => 'azhai',

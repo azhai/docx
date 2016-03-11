@@ -19,7 +19,7 @@ class ViewHandler extends Handler
     protected $page_type = 'view';
     protected $organiz = [];
     
-    public function locate($source_dir, $url)
+    public function locate($archives_dir, $url)
     {
         $node = $this->organiz;
         $pieces = explode('/', $url);
@@ -29,10 +29,10 @@ class ViewHandler extends Handler
             }
             $node = $node['nodes'][$slug];
         }
-        return $source_dir . DS . $node['path'];
+        return $archives_dir . DS . $node['path'];
     }
     
-    public function scanDocs($source_dir)
+    public function scanDocs($archives_dir)
     {
         $settings = $this->app->settings;
         $fs = new FileSystem('.md');
@@ -40,7 +40,7 @@ class ViewHandler extends Handler
         $cache_dir = APP_ROOT . DS . $settings['cache_dir'];
         $yaml_cache = new Cache\FileCache($cache_dir, $settings['cache_ext']);
         $cache->attach($yaml_cache);
-        $this->organiz = $fs->getOrganiz($source_dir, $cache);
+        $this->organiz = $fs->getOrganiz($archives_dir, $cache);
         $this->globals['organiz'] = $this->organiz;
     }
     
@@ -81,7 +81,10 @@ class ViewHandler extends Handler
         
         $settings = $this->app->settings;
         $assets_url = $settings['public_dir'] . '/' . $settings['assets_dir'];
-        if ($this->page_type === 'home') {
+        if ($this->app->route_key) {
+            $this->globals['urlpre'] = sprintf('?%s=/', $this->app->route_key);
+            $this->globals['assets_url'] = $assets_url;
+        } else if ($this->page_type === 'home') {
             $this->globals['urlpre'] = 'index.php/';
             $this->globals['assets_url'] = $assets_url;
         } else {
@@ -105,10 +108,10 @@ class ViewHandler extends Handler
     {
         $settings = $this->app->settings;
         $public_dir = APP_ROOT . DS . $settings['public_dir'];
-        $source_dir = $public_dir . DS . $settings['source_dir'];
-        $this->scanDocs($source_dir);
+        $archives_dir = $public_dir . DS . $settings['archives_dir'];
+        $this->scanDocs($archives_dir);
         $curr_url = $this->parseURL();
-        $nodepath = $this->locate($source_dir, $curr_url);
+        $nodepath = $this->locate($archives_dir, $curr_url);
         $doc = $this->readDoc($nodepath);
         $this->parseDoc($doc);
         $this->template = $this->globals['theme_dir'] . DS . $this->globals['layout'] . '.php';
@@ -145,10 +148,10 @@ class EditHandler extends ViewHandler
     {
         $settings = $this->app->settings;
         $public_dir = APP_ROOT . DS . $settings['public_dir'];
-        $source_dir = $public_dir . DS . $settings['source_dir'];
-        $this->scanDocs($source_dir);
+        $archives_dir = $public_dir . DS . $settings['archives_dir'];
+        $this->scanDocs($archives_dir);
         $curr_url = $this->parseURL();
-        $nodepath = $this->locate($source_dir, $curr_url);
+        $nodepath = $this->locate($archives_dir, $curr_url);
         $doc = $this->readDoc($nodepath);
         $this->parseDoc($doc);
         $this->globals['layout'] = 'edit' . DS . $this->globals['layout'];
@@ -159,10 +162,10 @@ class EditHandler extends ViewHandler
     {
         $settings = $this->app->settings;
         $public_dir = APP_ROOT . DS . $settings['public_dir'];
-        $source_dir = $public_dir . DS . $settings['source_dir'];
-        $this->scanDocs($source_dir);
+        $archives_dir = $public_dir . DS . $settings['archives_dir'];
+        $this->scanDocs($archives_dir);
         $curr_url = $this->parseURL();
-        $nodepath = $this->locate($source_dir, $curr_url);
+        $nodepath = $this->locate($archives_dir, $curr_url);
         $doc = $this->readDoc($nodepath);
         $this->updateDoc($doc);
         $this->parseDoc($doc);
@@ -202,7 +205,11 @@ class HtmlHandler extends ViewHandler
 
     public function finish()
     {
-        $home_url = '../../' . $this->globals['urlpre'];
+        if ($this->app->route_key) {
+            $home_url = '';
+        } else {
+            $home_url = '../../' . $this->globals['urlpre'];
+        }
         $public_dir = $this->app->settings['public_dir'];
         return Response::redirect($home_url . $public_dir . '/');
     }
@@ -211,24 +218,24 @@ class HtmlHandler extends ViewHandler
     {
         $settings = $this->app->settings;
         $public_dir = APP_ROOT . DS . $settings['public_dir'];
-        $source_dir = $public_dir . DS . $settings['source_dir'];
-        FileSystem::removeEmptyDirs($source_dir, 1);
-        $this->scanDocs($source_dir);
+        $archives_dir = $public_dir . DS . $settings['archives_dir'];
+        FileSystem::removeEmptyDirs($archives_dir, 1);
+        $this->scanDocs($archives_dir);
         $ignores = [
             $public_dir . DS . '.git',
-            $public_dir . DS . $this->app->settings['source_dir'],
+            $public_dir . DS . $this->app->settings['archives_dir'],
             $public_dir . DS . $this->app->settings['assets_dir'],
         ];
         FileSystem::removeAllFiles($public_dir, $ignores);
         
         $handler = $this;
         $staticize = function($node, $curr_url, $children = [])
-                        use($source_dir, $public_dir, $handler)
+                        use($archives_dir, $public_dir, $handler)
         {
             if ($node['is_file'] === 0) {
                 return;
             }
-            $nodepath = $source_dir . DS . $node['path'];
+            $nodepath = $archives_dir . DS . $node['path'];
             $doc = $handler->readDoc($nodepath);
             $handler->parseDoc($doc);
             $handler->parseURL($curr_url);
@@ -267,7 +274,11 @@ class RepoHandler extends Handler
 
     public function finish()
     {
-        $home_url = '../../' . $this->globals['urlpre'];
+        if ($this->app->route_key) {
+            $home_url = sprintf('?%s=/', $this->app->route_key);
+        } else {
+            $home_url = '../../' . $this->globals['urlpre'];
+        }
         return Response::redirect($home_url . 'index/');
     }
     

@@ -32,7 +32,19 @@
     </div>
 </div>
 
-<?=$this->block('content')?>
+<div class="container-fluid fluid-height wrapper">
+    <div class="row columns content">
+    
+        <div class="left-column article-tree col-sm-3 hidden-print">
+        <?php $this->includeTpl($theme_dir . '/navi.php'); ?>
+        </div>
+
+        <div class="right-column content-area col-sm-9">
+        <?=$this->block('content')?>
+        </div>
+
+    </div>
+</div>
 
 <?php if ($options['google_analytics']): ?>
 <script>

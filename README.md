@@ -6,10 +6,44 @@
 ## 快速使用 （docx添加）
 
 * 下载最新的项目代码 [docx](https://github.com/azhai/docx/archive/master.zip)，解压后在命令行下进入目录docx
-* 将web服务器的文档目录设置为public/source，打开浏览器查看网站，同时会生成静态页在public目录
-* 修改配置 index.php，编辑public/source目录*.md文档，重新生成静态文件
+* 将web服务器的文档目录设置为public/archives，打开浏览器查看网站，同时会生成静态页在public目录
+* 修改配置 index.php，编辑public/archives目录*.md文档，重新生成静态文件
+* 修改vendor/Docx的代码，请docx目录下运行命令行php index.php admin compress，重新生成vendor/docx.lite.php
 
-### Windows下安装使用
+### 2015-3-10 全部重写代码，去掉生成PDF
+
+使用nginx rewrite部署时，请去掉将location中的\.php$改为\.php或者\.php(/|$)，并去掉try_files
+
+保证temp和public两个目录可写
+
+php本身不带yaml扩展，请将配置中的cache_ext由.yml改为.json
+
+### 2014-10-16 Refactor
+
+重构代码，改为独立的几个类，并可使用压缩后的库文件。
+
+原来的命令行操作，除了git外，也都移到WEB管理页面。
+
+### 2014-04-12 Update
+
+增加PDF输出功能，需要安装WkHtmlToPdf
+
+### 2014-04-10 Update
+
+在Markdown中增加Metadata，支持设置文档标题和slug和时间等。
+
+可设置文档模板layout，支持文件倒序排列，可作为静态博客使用。Metadata类似这样：
+
+```
+layout:     post
+date:       2014-04-08
+title:      快速开始
+slug:       getting-started
+tags:       帮助, 快速开始
+comments:   false
+```
+
+## Windows下安装使用
 
 * 在电脑上安装PHP环境，推荐使用[Uniform Server Macro](http://sourceforge.net/projects/miniserver/files/MiniServer/PHP_MiniServer/)，直接解压到D:\盘，双击运行D:\UniServerMicro\phpMiniServer1.exe
 * 下载[docx最新的源码](http://git.oschina.net/azhai/docx/branches/recent)，解压到UniServerMacro\www\目录下，在浏览器地址栏输入 http://localhost/docx/ 就可以看到了。
@@ -38,42 +72,6 @@
     git commit -a -m '第一次生成静态博客'
     git push -u origin gitcafe-pages
     ```
-
-### 2015-3-10 全部重写代码，去掉生成PDF
-
-* nginx部署时，请去掉将location中的\.php$改为\.php或者\.php(/|$)，并去掉try_files
-
-* 保证temp和public两个目录可写
-
-* php本身不带yaml扩展，请将配置中的cache_ext由.yml改为.json
-
-* 如果docx目录有.git目录，无法在docx/public下再生成.git
-
-
-### 2014-10-16 Refactor
-
-重构代码，改为独立的几个类，并可使用压缩后的库文件。
-
-原来的命令行操作，除了git外，也都移到WEB管理页面。
-
-### 2014-04-12 Update
-
-增加PDF输出功能，需要安装WkHtmlToPdf
-
-### 2014-04-10 Update
-
-在Markdown中增加Metadata，支持设置文档标题和slug和时间等。
-
-可设置文档模板layout，支持文件倒序排列，可作为静态博客使用。Metadata类似这样：
-
-```
-layout:     post
-date:       2014-04-08
-title:      快速开始
-slug:       getting-started
-tags:       帮助, 快速开始
-comments:   false
-```
 
 ## 产品特征
 
