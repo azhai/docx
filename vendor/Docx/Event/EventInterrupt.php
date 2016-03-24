@@ -7,13 +7,11 @@
 
 namespace Docx\Event;
 
-use Exception;
-
 /**
- * 失败.
+ * 打断.
  *
  * @author Ryan Liu <azhai@126.com>
  */
-class EventFailed extends Exception
+class EventInterrupt extends \Exception
 {
 }

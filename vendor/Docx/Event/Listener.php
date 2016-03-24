@@ -12,41 +12,37 @@ use SplObserver;
 use Docx\Common;
 
 /**
- * 监听者.
+ * 监听器.
  *
  * @author Ryan Liu <azhai@126.com>
  */
 class Listener implements SplObserver
 {
-    public $callback = null;    //实际执行的响应函数
+    protected $slots = [];
 
-    public function __construct($callback = null)
+    /**
+     * 安装插件并注册方法
+     */
+    public function addPlugin($method, & $plugin)
     {
-        $this->callback = $callback;
+        $this->slots[strtolower($method)] = $plugin;
+        return $this;
     }
 
     /**
-     * 无答复的触发响应.
+     * 触发响应.
      *
-     * @param SplSubject $sender 发送者
+     * @param SplSubject $signal 信号
      */
-    public function update(SplSubject $sender)
+    public function update(SplSubject $signal)
     {
-        $this->reply($sender->message, $sender);
-    }
-
-    /**
-     * 有答复的执行响应.
-     *
-     * @param array $message 事件参数
-     * @param mixed $sender  发送者
-     *
-     * @return mixed
-     */
-    public function reply(array &$message, $sender = null)
-    {
-        if ($this->callback) {
-            return Common::execFunctionArray($this->callback, $message);
+        $name = strtolower($signal->name);
+        $args = $signal->args;
+        if (isset($this->slots[$name])) {
+            $plugin = $this->slots[$name];
+        } else {
+            $plugin = $this;
         }
+        return Common::execMethodArray($plugin, $name, $args);
     }
 }

@@ -8,8 +8,6 @@
 
 namespace Docx\Log;
 
-use Docx\Event\Listener;
-
 defined('LOG_WRITE_FILE_FREQ') or define('LOG_WRITE_FILE_FREQ', 1); //写文件的概率
 
 /**
@@ -17,7 +15,7 @@ defined('LOG_WRITE_FILE_FREQ') or define('LOG_WRITE_FILE_FREQ', 1); //写文件�
  *
  * @author Ryan Liu <azhai@126.com>
  */
-class FileLogger extends Listener
+class FileLogger extends BaseLogger
 {
     protected $filepath = '';
     protected $records = [];
@@ -54,16 +52,15 @@ class FileLogger extends Listener
         }
     }
 
-    public function reply(array &$message, $sender = null)
+    public function append($name, $content, array $extra)
     {
-        @list($content, $extra) = $message;
-        $filename = $extra['name'].'_'.date('Ymd', $extra['moment']);
+        $filename = $name . '_' . date('Ymd', $extra['moment']);
         $extra['moment'] = date('Y-m-d H:i:s', $extra['moment']);
-        $record = implode("\t", $extra)."\t".$content;
+        $record = implode("\t", $extra) . "\t" . $content;
         if (!isset($this->records[$filename])) {
             $this->records[$filename] = [];
         }
-        array_push($this->records[$filename], $record.PHP_EOL);
+        array_push($this->records[$filename], $record . PHP_EOL);
         if (LOG_WRITE_FILE_FREQ >= 1
                 || LOG_WRITE_FILE_FREQ >= mt_rand(1, 10000) / 10000) {
             $this->writeFiles();

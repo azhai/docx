@@ -8,8 +8,8 @@
 
 namespace Docx;
 
-use Docx\Common;
 use Docx\Web\Router;
+use Docx\Web\URL;
 
 
 /**
@@ -19,15 +19,12 @@ use Docx\Web\Router;
  */
 class Application
 {
-    use \Docx\Base\Behavior;
-
     protected static $properties = [ // 快捷属性
         'request' => '\\Docx\\Web\\Request',
         'response' => '\\Docx\\Web\\Response',
-        'session' => '\\Docx\\Web\\SessionHandler',
     ];
     protected $shortcuts = []; // 快捷方式
-    public $route_key = '';
+    public $url = null;
     public $settings = []; // 配置
 
     /**
@@ -52,20 +49,16 @@ class Application
         $this->installRef($importer, ['import', 'introduce', 'addClass']);
         $root = Router::getCurrent(); //根路由
         $this->installRef($root, ['dispatch', 'expose']);
-        $this->route_key = isset($settings['route_key']) ? $settings['route_key'] : '';
         $this->settings = $settings;
     }
 
     public function __get($name)
     {
-        $name = strtolower($name);
-        $prop = $this->prop($name);
-        if (!$prop && array_key_exists($name, self::$properties)) {
+        if (array_key_exists($name, self::$properties)) {
             $class = self::$properties[$name];
-            $prop = Common::execConstructArray($class);
-            $this->setProp($name, $prop);
+            $this->$name = Common::execConstructArray($class);
         }
-        return $prop;
+        return $this->$name;
     }
 
     /**
@@ -147,16 +140,9 @@ class Application
                 continue;
             }
             if (is_string($handler) && class_exists($handler, true)) {
-                $handler = new $handler($this, $backend);
+                $handler = new $handler($this, $backend, $method);
             }
             $backend = $handler;
-        }
-        if (!($handler instanceof \Closure)) {
-            $handler->globals['method'] = $method;
-            $handler->globals['path'] = $path;
-            $handler->globals['url'] = $route['url'];
-            $handler->globals['rule'] = $route['rule'];
-            $handler->globals['args'] = $route['args'];
         }
         $output = '';
         if (is_callable($handler)) {
@@ -179,9 +165,11 @@ class Application
         if (Common::isCLI()) {
             $argv = $this->request->getArgv();
             $path = '/' . implode('/', array_slice($argv, 1));
-            $method = 'exec';
+            $method = 'cmd';
         } else {
-            $path = $this->request->getPath($this->route_key);
+            $route_key = isset($settings['route_key']) ? $settings['route_key'] : '';
+            $this->url = new URL($route_key);
+            $path = $this->url->getPath();
             $method = $this->request->getMethod();
             if ($method === 'post') {
                 $method = $this->request->getString('_method', 'post');

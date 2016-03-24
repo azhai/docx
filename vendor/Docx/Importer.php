@@ -8,6 +8,7 @@
 
 namespace Docx;
 
+
 /**
  * 类加载器.
  *
@@ -227,5 +228,3 @@ final class Importer
         return $this->introduce($ns, $dir);
     }
 }
-
-\Docx\Importer::getInstance();

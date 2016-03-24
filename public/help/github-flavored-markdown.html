@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>       <html class="no-js ie6 oldie" lang="zh"> <![endif]-->
+<!--[if IE 7]>          <html class="no-js ie7 oldie" lang="zh"> <![endif]-->
+<!--[if IE 8]>          <html class="no-js ie8 oldie" lang="zh"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="zh">
+<!--<![endif]-->
+<head>
+<title>Markdown 语法 - docx文档生成工具</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="最简单的方式构建你的项目文档" />
+<meta name="author" content="Ryan Liu">
+<link rel="icon" href="../assets/img/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="../assets/css/style.min.css">
+<style rel="stylesheet">h1 a.html-hidden, div a.html-hidden</style>
+<!-- Mobile -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<!-- Docs -->
+<a href="https://github.com/azhai/docx" target="_blank" id="github-ribbon" class="hidden-print">
+    <img src="../assets/img/forkme_right_darkblue_121621.png" alt="Fork me on GitHub">
+</a>
+<div class="navbar navbar-fixed-top hidden-print">
+    <div class="container-fluid">
+        <a class="brand navbar-brand pull-left" href="../index.html">docx文档生成工具</a>
+        <p class="navbar-text pull-right"> 使用批处理 – Jack D. Herrington </p>
+    </div>
+</div>
+
+<div class="container-fluid fluid-height wrapper">
+    <div class="row columns content">
+    
+        <div class="left-column article-tree col-sm-3 hidden-print">
+        <!-- For Mobile -->
+<div class="responsive-collapse">
+    <button type="button" class="btn btn-sidebar" id="menu-spinner-button">
+    <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+    </button>
+</div>
+
+<div id="sub-nav-collapse" class="sub-nav-collapse">
+    <!-- Navigation -->
+    <ul class="nav nav-list">
+    <li>
+<a href="../index.html">首页</a>
+</li>
+<li class="open">
+<a href="#" class="aj-nav folder">Help</a>
+<ul class="nav nav-list">
+<li class="active">
+<a href="../help/github-flavored-markdown.html">Markdown 语法</a>
+</li>
+</ul>
+</li>    </ul>
+    <div class="well well-sidebar">
+        <div><a href="#" id="toggleCodeBlockBtn" onclick="toggleCodeBlocks();">外置代码框</a></div>
+            </div>
+    <div class="well well-sidebar">
+        <!-- Links -->
+        <div><a href="https://coding.net/u/azhai/p/docx/git" target="_blank">Coding仓库</a></div><div><a href="http://git.oschina.net/azhai/docx" target="_blank">OSChina仓库</a></div><div><a href="http://todaymade.com" target="_blank">Todaymade出品Daux.io</a></div><div><a href="http://blog.emx2.co.uk" target="_blank">Xin Meng翻译文档</a></div>    </div>
+</div>        </div>
+
+        <div class="right-column content-area col-sm-9">
+        <div class="content-page">
+    <article>
+        <div class="page-header sub-header clearfix">
+            <h1>Markdown 语法
+</h1>
+            <span style="float: left; font-size: 10px; color: gray;">
+            标签：帮助, markdown, github            </span>
+            <span style="float: right; font-size: 10px; color: gray;">
+            <!--a href="../author/"-->
+            <!--/a--> 写于 2014年4月8日 星期二            </span>
+        </div>
+
+        <p>让我从&quot;linebreak&quot; 开始. 下面的段落包含两个短语并且用单行分割.</p>
+<p>Roses are red
+Violets are blue</p>
+<p>下面的段落有同样的词组,但是这回他们使用两个空格和新的一行来分割:</p>
+<p>Roses are red
+Violets are blue</p>
+<p>哦,这里有一件事我还是无法忍受的,那就是使用多个下划线分割文字,类似于perform_complicated_task 或者 do_this_and_do_that_and_another_thing.</p>
+<h2>有一点GitHub的味道</h2>
+<p>除了前一个部分的改变外,这些参考是自动链接的:</p>
+<ul>
+<li>SHA: be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2</li>
+<li>User@SHA ref: mojombo@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2</li>
+<li>User/Project@SHA: mojombo/god@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2</li>
+<li>#Num: #1</li>
+<li>User/#Num: mojombo#1</li>
+<li>User/Project#Num: mojombo/god#1</li>
+</ul>
+<p>这里有一些危险的东西,我们需要重申一下email地址是不能分割的:</p>
+<p>我的邮箱地址是 tom@github.com.</p>
+<h2>数学很难,让我一起去购物吧</h2>
+<p>在一年级,我学会了5&gt;3和2&lt;7. 或者需要一些箭头. 1 -&gt; 2 -&gt; 3. 9 &lt;- 8 &lt;- 7.</p>
+<p>三角等式! a^2 + b^2 = c^2</p>
+<h2>我们都喜欢建列表</h2>
+<p>上面的header标签应该是 H2 标签. 现在,建立一个水果列表:</p>
+<ul>
+<li>Red Apples</li>
+<li>Purple Grapes</li>
+<li>Green Kiwifruits</li>
+</ul>
+<p>让我们开始疯狂:</p>
+<ol>
+<li>
+<p>这是一个两个段落的列表 Lorem ipsum dolorsit amet, consectetuer adipiscing elit. Aliquam hendreritmi posuere lectus.</p>
+<p>Vestibulum enim wisi, viverra nec, fringilla in, laoreetvitae, risus. Donec sit amet nisl. Aliquam semper ipsumsit amet velit.</p>
+</li>
+<li>Suspendisse id sem consectetuer libero luctus adipiscing.</li>
+</ol>
+<p>那么列表中的代码怎么办呢? <strong>in</strong>  疯了吧,是不是?</p>
+<ol>
+<li>
+<p>在 Ruby 中你可能要映射,就像这样:</p>
+<pre><code>['a', 'b'].map { |x| x.uppercase }</code></pre>
+</li>
+<li>
+<p>在Rails, 你可以做一个简写:</p>
+<pre><code>['a', 'b'].map(&amp;:uppercase)</code></pre>
+</li>
+</ol>
+<p>一些人更喜欢定义列表</p>
+<h2>我是一个机器人</h2>
+<p>或许你想打印<code>robot</code> 到控制台1000次. 为什么不呢?</p>
+<pre><code>def robot_invasionputs("robot " * 1000)end</code></pre>
+<p>你看到了吗,那被格式化为代码了,因为它已经被缩进了4个空格.</p>
+<p>那如果我们扔一些单箭头口号和&amp;符号会怎么样呢?</p>
+<pre><code>&lt;div class="footer"&gt;
+    &amp;copy; 2004 Foo Corporation
+&lt;/div&gt;</code></pre>
+<h2>一成不变</h2>
+<p>展示块对于ASCII艺术十分有用:</p>
+<pre>
+             ,-.
+    ,     ,-.   ,-.
+   / \   (   )-(   )
+   \ |  ,.>-(   )-<
+    \|,' (   )-(   )
+     Y ___`-'   `-'
+     |/__/   `-'
+     |
+     |
+     |    -hrr-
+  ___|_____________
+</pre>
+<h2>推卸责任</h2>
+<p>如果你需要责备他人,最好的方式是引用他们:</p>
+<blockquote>
+<p>I, at any rate, am convinced that He does not throw dice.</p>
+</blockquote>
+<p>或者一些人没有太厉害的口才:</p>
+<blockquote>
+<p>I wish you'd have given me this written question ahead of time so I
+could plan for it... I'm sure something will pop into my head here in
+the midst of this press conference, with all the pressure of trying to
+come up with answer, but it hadn't yet...</p>
+<p>I don't want to sound like
+I have made no mistakes. I'm confident I have. I just haven't - you
+just put me under the spot here, and maybe I'm not as quick on my feet
+as I should be in coming up with one.</p>
+</blockquote>
+<h2>两个表格</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Rank</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Tom Preston-Werner</td>
+        <td>Awesome</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Albert Einstein</td>
+        <td>Nearly as awesome</td>
+    </tr>
+</table>
+<h2>疯狂的链接</h2>
+<p>I get 10 times more traffic from <a href="http://google.com/" title="Google">Google</a> than from
+<a href="http://search.yahoo.com/" title="Yahoo Search">Yahoo</a> or <a href="http://search.msn.com/" title="MSN Search">MSN</a>.</p>
+<p><em>查看以上内容的源码 <a href="http://github.github.com/github-flavored-markdown/sample_content.html">source of this content</a>.</em></p>    </article>
+</div>        </div>
+
+    </div>
+</div>
+
+
+<script src="../assets/js/jquery.min.js"></script> 
+<script src="../assets/js/custom.js"></script> 
+<!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<!-- hightlight.js -->
+<script src="../assets/js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>

@@ -24,50 +24,16 @@ abstract class EnumType
     protected $name = '__default';
     protected $value = null;
 
-    public function __construct($initial_value = '__default', $strict = false)
+    public function __construct($initial = '__default')
     {
-        $this->value = self::getDefault();
-        if (is_int($initial_value) && is_numeric($initial_value)) { //提供值
-            $this->initByValue($initial_value, $strict);
-        } elseif (is_string($initial_value)) { //提供名称
-            $this->initByName($initial_value, $strict);
+        $value = null;
+        if ($initial && $initial !== '__default') {
+            $name = static::__prefix . strtoupper($initial);
+            $value = @constant(get_class($this) . '::' . $name);
         }
-    }
-
-    public static function getPrefix()
-    {
-        return static::__prefix;
-    }
-
-    public static function getDefault()
-    {
-        return static::__default;
-    }
-
-    public function initByValue($value, $strict = false)
-    {
-        $consts = $this->getConstList(true);
-        $key = array_search($value, $consts, $strict);
-        if ($key !== false) {
-            $this->name = $key;
-            $this->value = $value;
-        }
-    }
-
-    public function initByName($name = '__default', $strict = false)
-    {
-        if ($strict === false) {
-            $name = strtoupper($name);
-            $prefix = self::getPrefix();
-            if ($prefix && $name !== '__default') {
-                if (!Common::startsWith($name, $prefix)) { //补上前缀
-                    $name = $prefix . $name;
-                }
-            }
-        }
-        $class = get_class($this);
-        $value = constant($class . '::' . $name);
-        if (!is_null($value)) {
+        if (is_null($value)) {
+            $this->value = static::__default;
+        } else {
             $this->name = $name;
             $this->value = $value;
         }
@@ -77,32 +43,24 @@ abstract class EnumType
     {
         return strval($this->getValue());
     }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
+    
     public function getValue()
     {
         return $this->value;
     }
-
-    public function getConstList($include_default = false)
+    
+    public function getName($with_prefix = false)
     {
-        $result = [];
-        if ($include_default) {
-            $result['__default'] = self::getDefault();
+        if ($with_prefix || '__default' === $this->name) {
+            return $this->name;
+        } else {
+            return substr($this->name, static::__prefix);
         }
-        $names = $this->getConstants();
-        if ($names && is_array($names)) {
-            $class = get_class($this);
-            foreach ($names as $name) {
-                $result[$name] = constant($class.'::'.$name);
-            }
-        }
+    }
 
-        return $result;
+    public function isDefault()
+    {
+        return $this->getValue() === static::__default;
     }
 
     abstract public function getConstants();

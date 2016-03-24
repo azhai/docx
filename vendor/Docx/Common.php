@@ -8,6 +8,7 @@
 
 namespace Docx;
 
+
 /**
  * 常用方法.
  *

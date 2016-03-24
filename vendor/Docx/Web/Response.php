@@ -8,8 +8,6 @@
 
 namespace Docx\Web;
 
-use Docx\Web\MimeType;
-
 
 /**
  * 内容输出，带一个简单的模板引擎.

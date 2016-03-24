@@ -9,7 +9,6 @@
 namespace Docx\Log;
 
 use PDO;
-use Docx\Event\Listener;
 
 /**
  * 数据库日志.
@@ -29,7 +28,7 @@ use Docx\Event\Listener;
  *   KEY `moment` (`moment`)
  * ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
  */
-class DBLogger extends Listener
+class DBLogger extends BaseLogger
 {
     const ZONE_INTERVAL = 28800; //8小时
     protected $pdo = null;
@@ -73,11 +72,11 @@ class DBLogger extends Listener
         $this->pdo->exec($sql);
     }
 
-    public function reply(array &$message, $sender = null)
+    public function append($name, $content, array $extra)
     {
-        @list($content, $extra) = $message;
         $table = $this->getTable($extra['moment']);
         $extra['moment'] = date('Y-m-d H:i:s', $extra['moment']);
+        $extra['name'] = $name;
         $extra['content'] = $content;
         $this->insertRow($table, $extra);
     }

@@ -8,8 +8,8 @@
 
 namespace Docx\Cache;
 
-use Docx\Event\EventFailed;
 use Docx\Event\Listener;
+
 
 /**
  * 缓存客户端.
@@ -18,44 +18,27 @@ use Docx\Event\Listener;
  */
 abstract class BaseCache extends Listener
 {
-    const OP_READ = 0;
-    const OP_WRITE = 1;
-    const OP_REMOVE = 2;
-    const OP_CUSTOM = 3;
-
+    protected $agent = null;
+    
     /**
-     * 有答复的执行响应.
+     * 返回被缓存对象
      *
-     * @param array $message 事件参数
-     * @param mixed $sender  发送者
-     *
-     * @return mixed
+     * @return \Docx\Cache\Agent
      */
-    public function reply(array &$message, $sender = null)
+    public function getAgent($timeout = 0)
     {
-        $result = null;
-        list($action, $name) = $message;
-        switch ($action) {
-            case self::OP_READ:
-                $result = $this->read($name);
-                break;
-            case self::OP_WRITE:
-                $value = $message[2];
-                $timeout = $message[3];
-                $result = $this->write($name, $value, $timeout);
-                break;
-            case self::OP_REMOVE:
-                $result = $this->remove($name);
-                break;
-            default:
-                throw new EventFailed('Operation not supported!');
+        if (!$this->agent) {
+            $this->agent = new Agent($timeout);
+            $this->agent->initSignals($this);
         }
-
-        return $result;
+        return $this->agent;
     }
 
-    abstract public function prepare($name);
-    abstract public function read($name);
-    abstract public function write($name, $value, $timeout = 0);
-    abstract public function remove($name);
+    public function prepare()
+    {
+    }
+    
+    abstract public function read();
+    abstract public function write($value, $timeout = 0);
+    abstract public function remove();
 }

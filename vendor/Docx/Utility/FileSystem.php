@@ -9,8 +9,7 @@
 namespace Docx\Utility;
 
 use Docx\Common;
-use Docx\Utility\Word;
-use Docx\Utility\Markdoc;
+
 
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 defined('CACHE_UNLINK_EMPTY_FREQ') or define('CACHE_UNLINK_EMPTY_FREQ', 0.2); //删除空目录的概率
@@ -230,7 +229,10 @@ class FileSystem
         if (!is_dir($rootdir)) {
             return;
         }
-        $result = $cache ? $cache->get('docs', []) : [];
+        $result = [];
+        if ($cache) {
+            $cache->connect($result);
+        }
         $changed = $this->discover($result, $rootdir);
         if ($changed) {
             if (isset($result['nodes']['index'])) { //首页放在最前
@@ -238,7 +240,7 @@ class FileSystem
             }
             self::sortNames($result['nodes'], 'is_file', false, true);
             if ($cache) {
-                $cache->put('docs', $result);
+                $cache->put($result);
             }
         }
         return $result;

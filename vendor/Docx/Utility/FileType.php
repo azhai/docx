@@ -37,14 +37,6 @@ class FileType extends EnumType
     
     public static function getFileType($filename)
     {
-        $enum = new self();
-        try {
-            $type = filetype($filename);
-            if ($type !== false) {
-                $enum->initByName(strtoupper($type));
-            }
-        } catch (\Exception $e) {
-        }
-        return $enum;
+        return new self(filetype($filename));
     }
 }

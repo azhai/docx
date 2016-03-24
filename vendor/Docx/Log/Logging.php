@@ -9,7 +9,6 @@
 namespace Docx\Log;
 
 use Docx\Common;
-use Docx\Event\Sender;
 use Docx\Web\Request;
 
 /**
@@ -18,11 +17,13 @@ use Docx\Web\Request;
  * @author Ryan Liu <azhai@126.com>
  *
  * //EXAMPLE:
- * $logging = new Logging('test');
- * $logging->attach(new FileLogger('./logs'));
+ * $logger = new FileLogger('./logs');
+ * $logging = $logger->getLogging('test');
  */
-class Logging extends Sender
+class Logging
 {
+    use \Docx\Event\Sender;
+    
     protected $name = '';
     protected $threshold = 0;
 
@@ -31,11 +32,17 @@ class Logging extends Sender
      *
      * @param string $threshold 过滤级别（低于本级别的不记录）
      */
-    public function __construct($name = 'default', $level = 'DEBUG')
+    public function __construct($name = 'access', $level = 'DEBUG')
     {
         $this->name = $name;
+        $this->setLevel($level);
+    }
+    
+    public function setLevel($level)
+    {
         $log_level = new LogLevel($level);
         $this->threshold = $log_level->getValue();
+        return $this;
     }
 
     /**
@@ -80,9 +87,8 @@ class Logging extends Sender
                 'moment' => time(),
                 'ipaddr' => self::getClientIP(),
                 'level' => $level,
-                'name' => $this->name,
             ];
-            $this->emit($content, $extra);
+            $this->emit('append', $this->name, $content, $extra);
         }
     }
 

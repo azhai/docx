@@ -8,61 +8,62 @@
 
 namespace Docx\Cache;
 
+
 /**
  * CSV文件缓存.
  *
  * @author Ryan Liu <azhai@126.com>
  */
-class MatrixCache extends BaseCache
+class CsvCache extends BaseCache
 {
     protected $filename = '';   //完整文件路径
-    protected $dir = '';
-    protected $ext = '';
+    protected $extname = '';
     protected $delimiter = '';  //列分隔符
     protected $at_least = 0;    //最少列数
 
-    public function __construct($dir = false, $ext = '.csv',
-                                $delimiter = "\t", $at_least = 0)
+    public function __construct($filename, $delimiter = "\t", $at_least = 0)
     {
-        if (empty($dir)) {
-            $this->dir = sys_get_temp_dir();
-        } else {
-            $this->dir = rtrim($dir, DIRECTORY_SEPARATOR);
-            @mkdir($this->dir, 0755, true);
-        }
-        $this->ext = '.'.ltrim(strtolower($this->ext), '.');
+        $this->filename = $filename;
         $this->delimiter = $delimiter ?: "\t";
         $this->at_least = intval($at_least);
     }
 
     /**
-     * 准备文件、加载扩展、连接服务
+     * 不存在时创建文件，并确定扩展名
      *
-     * @param string $name 键名
+     * @return string 扩展名
+     */
+    public static function detectFile($filename)
+    {
+        $parts = pathinfo($filename);
+        @mkdir($parts['dirname'], 0755, true);
+        if (!is_readable($filename)) {
+            touch($filename);
+        }
+        $extname = '.' . strtolower($parts['extension']);
+        return $extname;
+    }
+
+    /**
+     * 准备文件、加载扩展、连接服务
      *
      * @return bool 是否成功
      */
-    public function prepare($name)
+    public function prepare()
     {
-        $this->filename = $this->dir.DIRECTORY_SEPARATOR
-                                    .$name.$this->ext;
-        if (!is_readable($this->filename)) {
-            touch($this->filename);
+        if (empty($this->extname)) {
+            $this->extname = self::detectFile($this->filename);
         }
-
-        return true;
     }
 
     /**
      * 读操作.
      *
-     * @param string $name 键名
-     *
      * @return mixed 对应值
      */
-    public function read($name)
+    public function read()
     {
-        $this->prepare($name);
+        $this->prepare();
         $bytes = filesize($this->filename);
         if ($bytes === false || $bytes === 0) {
             return;
@@ -93,15 +94,14 @@ class MatrixCache extends BaseCache
     /**
      * 写操作.
      *
-     * @param string $name    键名
      * @param mixed  $value   对应值
      * @param int    $timeout 缓存时间
      *
      * @return bool 是否成功
      */
-    public function write($name, $value, $timeout = 0)
+    public function write($value, $timeout = 0)
     {
-        $this->prepare($name);
+        $this->prepare();
         $fh = fopen($this->filename, 'wb');
         if ($fh === false || !is_array($value)) {
             return false;
@@ -117,13 +117,11 @@ class MatrixCache extends BaseCache
     /**
      * 删除操作.
      *
-     * @param string $name 键名
-     *
      * @return bool 是否成功
      */
-    public function remove($name)
+    public function remove()
     {
-        $this->prepare($name);
+        $this->prepare();
         if (file_exists($this->filename)) {
             return unlink($this->filename);
         }

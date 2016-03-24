@@ -10,6 +10,7 @@ namespace Docx\Web;
 
 use Docx\Common;
 
+
 /**
  * 路由器
  * 简化自James Cleveland的Ham <https://github.com/radiosilence/Ham>.
@@ -35,6 +36,11 @@ class Router
         '<path>' => '([a-z0-9\-_/]*)',
         '<word>' => '([^/]*)',
     ];
+    public $rule = '';
+    public $path = '';
+    public $url = '';
+    public $args = [];
+    public $handlers = [];
     protected static $current = null;
     protected $filename = '';
     protected $prefix = '';
@@ -102,7 +108,7 @@ class Router
         // 完全匹配还是匹配开头
         $wildcard = ($is_wild === false) ? '' : '(.*)?';
 
-        return '!^'.$url.'/?'.$wildcard.'$!';
+        return '!^' . $url . '/?' . $wildcard . '$!';
     }
 
     /**
@@ -142,7 +148,7 @@ class Router
     {
         // 扫描目录下符合格式的文件
         $directory = rtrim($directory, DIRECTORY_SEPARATOR);
-        $files = glob($directory.'/'.$wildcard, GLOB_BRACE);
+        $files = glob($directory . '/' . $wildcard, GLOB_BRACE);
         if (!empty($files)) { // 记录含有路由的文件和对应前缀
             $dirlen = strlen($directory); // 前缀是相对于上级路由器前缀的
             foreach ($files as $filename) {
@@ -169,7 +175,7 @@ class Router
      */
     public function dispatch($path, $is_sorted = false)
     {
-        $path = rtrim(strtolower($path), ' /') . '/';
+        $path = rtrim(strtolower($path), '/') . '/';
         // 先寻找匹配的路由器
         if (!$is_sorted) {
             krsort($this->children); // 贪婪匹配，需要逆向排序
@@ -188,13 +194,13 @@ class Router
         foreach ($this->items as $rule => $handlers) {
             if (preg_match($rule, $path, $args) === 1) {
                 // 第一项为匹配的网址
-                $url = $this->prefix.array_shift($args);
-
+                $uri = $this->prefix . array_shift($args);
                 return [
                     'handlers' => $handlers,
                     'args' => $args,
-                    'url' => $url,
                     'rule' => $rule,
+                    'path' => $path,
+                    'uri' => $uri,
                 ];
             }
         }

@@ -10,7 +10,6 @@ namespace Docx\Web;
 
 use Docx\Common;
 use Docx\Application;
-use Docx\Web\Response;
 
 
 /**
@@ -24,12 +23,16 @@ class Handler
     protected $backend = null;
     protected $template = '';
     protected $context = [];
-    public $globals = ['method' => 'get'];
+    public $method = 'get';
+    public $args = [];
+    public $globals = [];
 
-    public function __construct(Application& $app, & $backend = null)
+    public function __construct(Application& $app,
+                & $backend = null, $method = 'get')
     {
         $this->app = $app;
         $this->backend = $backend;
+        $this->method = $method;
     }
 
     public function __toString()
@@ -42,10 +45,10 @@ class Handler
 
     public function __invoke()
     {
+        $this->args = func_get_args();
         $this->prepare();
-        $action = $this->globals['method'] . 'Action';
-        $args = func_get_args();
-        Common::execMethodArray($this, $action, $args);
+        $action = $this->method . 'Action';
+        Common::execMethodArray($this, $action, $this->args);
         $this->finish();
         return $this;
     }

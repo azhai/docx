@@ -58,6 +58,7 @@ if (is_readable($package_file)) { // 使用压缩后的文件
     require_once $package_file;
 } else {
     require_once VENDOR_DIR . '/Docx/Importer.php';
+    \Docx\Importer::getInstance();
 }
 
 $app = new \Docx\Application($settings);

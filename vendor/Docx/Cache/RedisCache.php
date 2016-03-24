@@ -10,6 +10,7 @@ namespace Docx\Cache;
 
 use Docx\Common;
 
+
 /**
  * Redis文件缓存.
  *
@@ -25,22 +26,27 @@ class RedisCache extends BaseCache
     const SHAPE_DATETIME = 'datetime';
 
     protected $redis = null;
-    protected $shape = '';      //数据类型
+    public $name = '';
+    public $shape = '';      //数据类型
 
-    public function __construct($redis, $shape = 'string')
+    public function __construct(& $redis, $name, $shape = 'string')
     {
         $this->redis = $redis;
+        $this->name = $name;
         $this->shape = $shape;
+    }
+    
+    public function getRedis()
+    {
+        return $this->redis;
     }
 
     /**
      * 准备文件、加载扩展、连接服务
      *
-     * @param string $name 键名
-     *
      * @return bool 是否成功
      */
-    public function prepare($name)
+    public function prepare()
     {
         try {
             $this->redis->ping();
@@ -51,75 +57,48 @@ class RedisCache extends BaseCache
     }
 
     /**
-     * 有答复的执行响应.
-     *
-     * @param array $message 事件参数
-     * @param mixed $sender  发送者
-     *
-     * @return mixed
-     */
-    public function reply(array &$message, $sender = null)
-    {
-        $result = null;
-        list($action, $method) = $message;
-        if ($action === self::OP_CUSTOM) {
-            $args = array_slice($message, 2);
-            $result = Common::execMethodArray($this, $method, $args);
-        } else {
-            $result = parent::reply($message, $sender);
-        }
-
-        return $result;
-    }
-
-    /**
      * 读操作.
-     *
-     * @param string $name 键名
      *
      * @return mixed 对应值
      */
-    public function read($name)
+    public function read()
     {
-        $this->prepare($name);
+        $this->prepare();
         if ($this->shape === self::SHAPE_OBJECT) {
-            $data = $this->redis->hGetAll($name);
+            $data = $this->redis->hGetAll($this->name);
         } elseif ($this->shape === self::SHAPE_ARRAY) {
-            $data = $this->redis->lRange($name, 0, -1);
+            $data = $this->redis->lRange($this->name, 0, -1);
         } else {
-            $data = $this->redis->get($name);
+            $data = $this->redis->get($this->name);
         }
-
         return $data;
     }
 
     /**
      * 写操作.
      *
-     * @param string $name    键名
      * @param mixed  $value   对应值
      * @param int    $timeout 缓存时间
      *
      * @return bool 是否成功
      */
-    public function write($name, $value, $timeout = 0)
+    public function write($value, $timeout = 0)
     {
-        $this->prepare($name);
+        $this->prepare();
         if ($this->shape === self::SHAPE_OBJECT) {
             foreach ($value as $key => $part) {
-                $this->redis->hSet($name, $key, $part);
+                $this->redis->hSet($this->name, $key, $part);
             }
         } elseif ($this->shape === self::SHAPE_ARRAY) {
             foreach ($value as $part) {
-                $this->redis->lPush($name, $part);
+                $this->redis->lPush($this->name, $part);
             }
         } else {
-            $this->redis->set($name, $value);
+            $this->redis->set($this->name, $value);
         }
         if ($timeout > 0) {
-            $this->redis->expire($name, $timeout);
+            $this->redis->expire($this->name, $timeout);
         }
-
         return true;
     }
 
@@ -130,33 +109,32 @@ class RedisCache extends BaseCache
      *
      * @return bool 是否成功
      */
-    public function remove($name)
+    public function remove()
     {
-        $this->prepare($name);
-        $effects = $this->redis->del($name);
-
+        $this->prepare();
+        $effects = $this->redis->del($this->name);
         return $effects > 0;
     }
 
-    public function incre($name, $step = 1)
+    public function incre($step = 1)
     {
-        $this->prepare($name);
+        $this->prepare();
         $step = abs($step);
         if ($step === 1) {
-            return $this->redis->incre($key);
+            return $this->redis->incre($this->name);
         } else {
-            return $this->redis->increBy($key, $step);
+            return $this->redis->increBy($this->name, $step);
         }
     }
 
-    public function decre($name, $step = 1)
+    public function decre($step = 1)
     {
-        $this->prepare($name);
+        $this->prepare();
         $step = abs($step);
         if ($step === 1) {
-            return $this->redis->decre($key);
+            return $this->redis->decre($this->name);
         } else {
-            return $this->redis->decreBy($key, $step);
+            return $this->redis->decreBy($this->name, $step);
         }
     }
 }

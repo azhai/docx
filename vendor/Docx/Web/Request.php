@@ -11,6 +11,7 @@ namespace Docx\Web;
 use Docx\Common;
 @session_start();
 
+
 /**
  * 输入参数过滤器
  * 注意$_SERVER中只有少量元素出现在INPUT_SERVER中.
@@ -19,8 +20,6 @@ use Docx\Common;
  */
 class Request
 {
-    const PHP_INDEX_FILE = 'index.php';
-
     /**
      * getValue()或getInput()的简写形式
      * 如：getInt($key, $default)等价于getValue('REQUEST', $key, $default, 'int').
@@ -185,28 +184,10 @@ class Request
      *
      * @return string
      */
-    public static function getPath($route_key = null)
+    public static function getURIPath()
     {
-        if ($route_key) {
-            return self::pop($route_key, '/');
-        }
-        $url = self::getInput('SERVER', 'REQUEST_URI');
-        $url = parse_url($url, PHP_URL_PATH);
-        $name = self::getInput('SERVER', 'SCRIPT_NAME');
-        if (empty($url) || $url === $name) {
-            return '';
-        }
-        
-        $path = rtrim($url, '/ ') . '/';
-        $head = substr($name, 0, - strlen(self::PHP_INDEX_FILE));
-        if ($path . self::PHP_INDEX_FILE === $name) {
-            $path = '/';
-        } else if (Common::startsWith($path, $name)) {
-            $path = substr($path, strlen($name));
-        } else if (Common::startsWith($path, $head)) {
-            $path = substr($path, strlen($head) - 1);
-        }
-        return $path;
+        $uri = self::getInput('SERVER', 'REQUEST_URI');
+        return parse_url($uri, PHP_URL_PATH);
     }
 
     /**

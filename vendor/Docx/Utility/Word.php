@@ -8,6 +8,7 @@
 
 namespace Docx\Utility;
 
+
 /**
  * 单词转换
  * NOTICE:
@@ -36,7 +37,7 @@ class Word
      */
     public static function slugify($name)
     {
-        return strtolower(str_replace(' ', '-', $name));
+        return strtolower(str_replace([' ','_'], '-', $name));
     }
 
     /**

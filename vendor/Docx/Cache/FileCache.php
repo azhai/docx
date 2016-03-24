@@ -8,6 +8,7 @@
 
 namespace Docx\Cache;
 
+
 /**
  * 文件缓存.
  *
@@ -16,18 +17,12 @@ namespace Docx\Cache;
 class FileCache extends BaseCache
 {
     protected $filename = '';   //完整文件路径
-    protected $dir = '';
-    protected $ext = '';
+    protected $extname = '';
 
-    public function __construct($dir = false, $ext = '.php')
+    public function __construct($filename = '', $extname = '')
     {
-        if (empty($dir)) {
-            $this->dir = sys_get_temp_dir();
-        } else {
-            $this->dir = rtrim($dir, DIRECTORY_SEPARATOR);
-            @mkdir($this->dir, 0755, true);
-        }
-        $this->ext = '.' . ltrim(strtolower($ext), '.');
+        $this->filename = $filename;
+        $this->extname = $extname;
     }
 
     public static function dumpYaml($data)
@@ -51,38 +46,30 @@ class FileCache extends BaseCache
     /**
      * 准备文件、加载扩展、连接服务
      *
-     * @param string $name 键名
-     *
      * @return bool 是否成功
      */
-    public function prepare($name)
+    public function prepare()
     {
-        $this->filename = $this->dir.DIRECTORY_SEPARATOR
-                                    .$name.$this->ext;
-        if (!is_readable($this->filename)) {
-            touch($this->filename);
+        if (empty($this->filename)) {
+            $this->filename = tempnam(sys_get_temp_dir(), 'cache_');
+        } else if (empty($this->extname)) {
+            $this->extname = CsvCache::detectFile($this->filename);
         }
-        if ($this->ext === '.yml' || $this->ext === '.yaml') {
-        }
-
-        return true;
     }
 
     /**
      * 读操作.
      *
-     * @param string $name 键名
-     *
      * @return mixed 对应值
      */
-    public function read($name)
+    public function read()
     {
-        $this->prepare($name);
+        $this->prepare();
         $bytes = filesize($this->filename);
         if ($bytes === false || $bytes === 0) {
             return;
         }
-        if ($this->ext === '.php') {
+        if ($this->extname === '.php') {
             return include $this->filename;
         } else {
             $cipher = file_get_contents($this->filename);
@@ -93,16 +80,15 @@ class FileCache extends BaseCache
     /**
      * 写操作.
      *
-     * @param string $name    键名
      * @param mixed  $value   对应值
      * @param int    $timeout 缓存时间
      *
      * @return bool 是否成功
      */
-    public function write($name, $value, $timeout = 0)
+    public function write($value, $timeout = 0)
     {
-        $this->prepare($name);
-        $data = $this->encode($value, $name);
+        $this->prepare();
+        $data = $this->encode($value);
         $bytes = file_put_contents($this->filename, $data, LOCK_EX);
 
         return $bytes && $bytes > 0;
@@ -111,13 +97,11 @@ class FileCache extends BaseCache
     /**
      * 删除操作.
      *
-     * @param string $name 键名
-     *
      * @return bool 是否成功
      */
-    public function remove($name)
+    public function remove()
     {
-        $this->prepare($name);
+        $this->prepare();
         if (file_exists($this->filename)) {
             return unlink($this->filename);
         }
@@ -132,7 +116,8 @@ class FileCache extends BaseCache
      */
     protected function decode($cipher)
     {
-        switch ($this->ext) {
+        switch ($this->extname) {
+            case '':
             case '.txt':
             case '.htm':
             case '.html':
@@ -159,7 +144,8 @@ class FileCache extends BaseCache
      */
     protected function encode($data)
     {
-        switch ($this->ext) {
+        switch ($this->extname) {
+            case '':
             case '.txt':
             case '.htm':
             case '.html':

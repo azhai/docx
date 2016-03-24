@@ -8,8 +8,6 @@
 
 namespace Docx\Base;
 
-use Docx\Base\Storage;
-
 
 /**
  * 对象工厂.
@@ -32,7 +30,7 @@ class Factory
     /**
      * 正规化类名
      */
-    public function normalize($class)
+    public static function normalize($class)
     {
         return rtrim($class, '\\');
     }
@@ -43,7 +41,7 @@ class Factory
     public function create($name, $key = 'default')
     {
         $section = $this->storage->getSectionOnce($name);
-        $class = $this->normalize($section->getItem('class'));
+        $class = self::normalize($section->getItem('class'));
         $data = $section->getArray($key);
         if ($key !== 'default') {
             $data = array_merge($section->getArray('default'), $data);
