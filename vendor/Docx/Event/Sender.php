@@ -17,29 +17,41 @@ trait Sender
 {
     protected $signals = [];
     
-    public function getSignal($name, $create = false)
+    public function __get($name)
+    {
+        if (!isset($this->signals[$name])) {
+            $this->signals[$name] = new Signal();
+        }
+        return $this->signals[$name];
+    }
+    
+    public function __set($name, $signal)
+    {
+        $this->signals[$name] = $signal;
+    }
+    
+    public function __call($name, $args)
     {
         if (isset($this->signals[$name])) {
-            return $this->signals[$name];
-        } else if ($create) {
-            $this->signals[$name] = new Signal($name, $this);
-            return $this->signals[$name];
+            $signal = $this->signals[$name];
+            return $signal->emit($name, $args);
         }
     }
     
-    public function addEvent($name, $listener)
+    public function addEvent($names, & $slot, $class = 'Listener')
     {
-        $signal = $this->getSignal($name, true);
-        $signal->attach($listener);
+        if ($class === 'Listener' || $class === 'RuptListener') {
+            $class = __NAMESPACE__ . '\\' . $class;
+        }
+        $listener = new $class();
+        $listener->addSlot($slot, $names);
+        if (!is_array($names)) {
+            $this->$names->attach($listener);
+        } else {
+            foreach ($names as $name) {
+                $this->$name->attach($listener);
+            }
+        }
         return $this;
-    }
-    
-    public function emit($name)
-    {
-        $signal = $this->getSignal($name, false);
-        if ($signal) {
-            $signal->args = array_slice(func_get_args(), 1);
-            return $signal->notify();
-        }
     }
 }

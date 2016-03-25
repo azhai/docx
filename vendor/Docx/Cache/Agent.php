@@ -8,7 +8,8 @@
 
 namespace Docx\Cache;
 
-use Docx\Event\Signal;
+use Docx\Event\Listener;
+use Docx\Event\RuptListener;
 
 
 /**
@@ -23,10 +24,6 @@ use Docx\Event\Signal;
 class Agent
 {
     use \Docx\Event\Sender;
-    
-    const OP_READ = 'read';
-    const OP_WRITE = 'write';
-    const OP_REMOVE = 'remove';
 
     protected $timeout = -1; //失效时间
     protected $data = null; //数据
@@ -37,14 +34,13 @@ class Agent
     }
     
     /**
-     * 初始化信号
+     * 添加缓存
      */
-    public function initSignals(& $cache)
+    public function addCache(BaseCache& $cache)
     {
-        $this->addEvent(self::OP_READ, $cache);
-        $this->getSignal(self::OP_READ)->setMode(Signal::FIRST_SUCCESS);
-        $this->addEvent(self::OP_WRITE, $cache);
-        $this->addEvent(self::OP_REMOVE, $cache);
+        $this->addEvent('read', $cache, 'RuptListener');
+        $this->addEvent(['write', 'remove'], $cache);
+        return $this;
     }
 
     /**
@@ -89,7 +85,7 @@ class Agent
      */
     public function get($default = null)
     {
-        $this->data = $this->emit(self::OP_READ);
+        $this->data = $this->read();
         return is_null($this->data) ? $default : $this->data;
     }
 
@@ -100,10 +96,10 @@ class Agent
      *
      * @return mixed 属性值
      */
-    public function put($data = null)
+    public function put($data)
     {
-        $data = is_null($data) ? $this->data : $data;
-        $this->emit(self::OP_WRITE, $data, $this->timeout);
+        $this->data = $data;
+        $this->write($data, $this->timeout);
         return $data;
     }
 
@@ -112,9 +108,9 @@ class Agent
      *
      * @return bool
      */
-    public function remove()
+    public function del()
     {
         $this->data = null;
-        return $this->emit(self::OP_REMOVE);
+        return $this->remove();
     }
 }

@@ -8,8 +8,8 @@
 
 namespace Docx\Base;
 
-use ArrayAccess;
-use Countable;
+use \ArrayAccess;
+use \Countable;
 
 
 /**

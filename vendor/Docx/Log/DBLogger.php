@@ -8,7 +8,7 @@
 
 namespace Docx\Log;
 
-use PDO;
+use \PDO;
 
 /**
  * 数据库日志.

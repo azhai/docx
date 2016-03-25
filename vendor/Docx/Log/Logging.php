@@ -9,7 +9,9 @@
 namespace Docx\Log;
 
 use Docx\Common;
+use Docx\Event\Listener;
 use Docx\Web\Request;
+
 
 /**
  * 日志.
@@ -88,7 +90,7 @@ class Logging
                 'ipaddr' => self::getClientIP(),
                 'level' => $level,
             ];
-            $this->emit('append', $this->name, $content, $extra);
+            $this->append($this->name, $content, $extra);
         }
     }
 

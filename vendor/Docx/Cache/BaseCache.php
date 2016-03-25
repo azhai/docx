@@ -8,28 +8,26 @@
 
 namespace Docx\Cache;
 
-use Docx\Event\Listener;
-
 
 /**
  * 缓存客户端.
  *
  * @author Ryan Liu <azhai@126.com>
  */
-abstract class BaseCache extends Listener
+abstract class BaseCache
 {
     protected $agent = null;
     
     /**
      * 返回被缓存对象
      *
-     * @return \Docx\Cache\Agent
+     * @return object
      */
     public function getAgent($timeout = 0)
     {
         if (!$this->agent) {
             $this->agent = new Agent($timeout);
-            $this->agent->initSignals($this);
+            $this->agent->addCache($this);
         }
         return $this->agent;
     }

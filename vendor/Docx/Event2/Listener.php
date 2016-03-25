@@ -11,7 +11,6 @@ use \SplSubject;
 use \SplObserver;
 use Docx\Common;
 
-
 /**
  * 监听器.
  *
@@ -20,18 +19,22 @@ use Docx\Common;
 class Listener implements SplObserver
 {
     protected $slots = [];
+    
+    public function getSlot($name)
+    {
+        if (isset($this->slots[$name])) {
+            return $this->slots[$name];
+        } else if (method_exists($this, $name)) {
+            return $this;
+        }
+    }
 
     /**
-     * 安装槽并注册方法
+     * 安装插件并注册方法
      */
-    public function addSlot(& $slot, $names)
+    public function addPlugin(& $plugin, $name)
     {
-        if (!is_array($names)) {
-            $names = array_slice(func_get_args(), 1);
-        }
-        foreach ($names as $name) {
-            $this->slots[$name] = & $slot;
-        }
+        $this->slots[$name] = & $plugin;
         return $this;
     }
 
@@ -43,9 +46,7 @@ class Listener implements SplObserver
     public function update(SplSubject $signal)
     {
         $name = $signal->getName();
-        if (isset($this->slots[$name])) {
-            $slot = $this->slots[$name];
-            return Common::execMethodArray($slot, $name, $signal->args);
-        }
+        $plugin = $this->getSlot($name);
+        return Common::execMethodArray($plugin, $name, $signal->args);
     }
 }

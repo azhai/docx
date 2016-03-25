@@ -8,12 +8,11 @@
 
 namespace Docx\Log;
 
-use Docx\Event\Listener;
 
 /**
  * 日志记录器.
  */
-abstract class BaseLogger extends Listener
+abstract class BaseLogger
 {
     protected $logging = null;
     
